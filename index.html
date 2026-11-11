@@ -733,6 +733,8 @@ table.tdash th svg{width:18px;height:18px}table.tdash td,table.tdash th{padding:
 .nudge{font-size:18px;line-height:1.45;margin:4px 0 8px}
 details.seeans{margin-top:6px}
 .vmore{display:block;margin-top:10px;font-weight:400}
+#sayBtn.saying{background:var(--accent);color:#fff;border-color:var(--accent)}
+.screen ::selection{background:#ffe066;color:#111}
 .vplayer .vctrl{grid-template-columns:1fr 1.4fr}
 details.seeans>summary{cursor:pointer;font-weight:700;color:var(--accent);min-height:40px;padding:8px 0}
 .include .unit.ucard{border:1.5px solid var(--hair);border-radius:16px;padding:10px 12px;background:var(--surface)}
@@ -1156,7 +1158,7 @@ function freshTopic(L){return {th:(L||4)+0.5,n:0,lh:{2:[],3:[],4:[],5:[]},cc:[],
 function fresh(){
   const tp={};TOPICS.forEach(t=>tp[t]=freshTopic(3));
   return {v:1,setup:false,name:"",goal:4,start:3,on:Object.fromEntries(TOPICS.map(t=>[t,false])),paced:false,
-   a11y:{dys:false,big:false,tint:"none",voice:true,narr:true,type:false},
+   a11y:{dys:false,big:false,tint:"none",voice:true,narr:false,type:false},
    tp,recent:[],big:{},bigT:{},bigF:{},mem:{},noteRev:{},we:{},cls:"",focus:false,focusPin:"",held:0,tags:{},notes:{},nb:[],blockNo:0,answered:0,units:{},
    j:0,earned:0,owned:{},eq:{theme:"cobalt",trail:"dot",stickers:[],title:""},boost:0,confetti:false,badges:{},run:0,
    day:null,streak:{n:0,last:"",best:0},freezes:0,chests:0,chestProg:0,mom:null,fade:{}};
@@ -1166,7 +1168,7 @@ function load(){try{const r=localStorage.getItem(KEY);if(r)merge(JSON.parse(r));
 function merge(o){const f=fresh();
   S={...f,...o,bigF:o.bigF||{},mem:o.mem||{},noteRev:o.noteRev||{},we:o.we||{},a11y:{...f.a11y,...(o.a11y||{})},on:{...f.on,...(o.on||{})},tp:{...f.tp},eq:{...f.eq,...(o.eq||{})},owned:o.owned||{},badges:o.badges||{},
    streak:{...f.streak,...(o.streak||{})},fade:o.fade||{},tags:o.tags||{},notes:o.notes||{},nb:o.nb||[],big:o.big||{},bigT:o.bigT||{},units:o.units||{}};
-  S.goal=Math.max(3,Math.min(4,S.goal||4));if(!o.u3)S.paced=false;S.u3=1;S.start=Math.max(2,Math.min(4,S.start||3));
+  S.goal=Math.max(3,Math.min(4,S.goal||4));if(!o.u3)S.paced=false;S.u3=1;if(!o.hl){S.a11y.narr=false;}S.hl=1;S.start=Math.max(2,Math.min(4,S.start||3));
   TOPICS.forEach(t=>{const x=(o.tp||{})[t];if(x)S.tp[t]={...freshTopic(3),...x,lh:{2:[],3:[],4:[],5:[],...(x.lh||{})}};});}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
 function setStart(L){S.start=L;TOPICS.forEach(t=>{S.tp[t]=freshTopic(L);});S.recent=[];}
@@ -6955,7 +6957,7 @@ function watch(id,o,ci,si){
   let tok=0,shortNow=false,wasShort=false;const ch=n.ch[ci];
   const show=()=>{tok++;const my=tok;stopSpeech();const [c,f,opt={}]=ch.sc[si];frame.innerHTML=fracify(typeof f==="function"?f():f);
     /* With sound on, the screen shows the key point and the voice explains (no word-for-word repeat). With sound off, or in dyslexia mode, the full words show. */
-    const sound=!S.vmute&&S.a11y.narr!==false&&!!window.speechSynthesis,shortCap=sound&&!S.a11y.dys;
+    const sound=!S.vmute&&S.a11y.narr!==false&&!!window.speechSynthesis,shortCap=true;
     shortNow=shortCap;wasShort=shortCap;cap.innerHTML=fracify(shortCap?`<b>${ch.pt}</b>`:c);
     const svg=frame.querySelector("svg");
     if(svg)try{if(reduce()){svg.setCurrentTime(30);svg.pauseAnimations();}else{svg.pauseAnimations();svg.setCurrentTime(0);}}catch(e){}
@@ -7384,7 +7386,7 @@ planet:`<svg viewBox="0 0 24 24" class="ic"><circle cx="12" cy="12" r="5.5"/><pa
 const topicChip=t=>`<span class="tchip">${TIC[TOPIC[t].ic]}<span class="tn">${TOPIC[t].t}</span><b class="lvchip${workLevel(t)<3?" found":""}" title="${LN(workLevel(t))}">${LS(workLevel(t))}</b></span>`;
 const topicBadge=(t,big)=>`<span class="tbadge${big?" big":""}">${TIC[TOPIC[t].ic]}</span>`;
 const trackBtn=()=>`<button class="nbtn" data-go="strength" aria-label="My progress"><svg viewBox="0 0 24 24" class="ic"><path d="M5 20V12M12 20V6M19 20v-9"/></svg></button>`;
-const speakBtn=()=>S.a11y.voice?`<button class="nbtn" id="sayBtn" aria-label="Read aloud"><svg viewBox="0 0 24 24" class="ic"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M16 9a4 4 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11"/></svg></button>`:"";
+const speakBtn=()=>S.a11y.voice?`<button class="nbtn" id="sayBtn" aria-label="Read the highlighted words aloud" title="Highlight words, then press to hear them"><svg viewBox="0 0 24 24" class="ic"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M16 9a4 4 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11"/></svg></button>`:"";
 function slim(mid){const q=HOLD||focusOn();return `<div class="slim"><button class="x" data-go="home" aria-label="Home">✕</button><div class="slim-mid">${mid}</div><div class="slim-r row-g">${speakBtn()}${trackBtn()}${!q&&(S.run||0)>=3?`<span class="cchip" title="Combo">🔥×${comboMult()}</span>`:""}${!q&&S.mom&&S.mom.left>0?`<span class="mchip" title="Momentum">⚡×2·${S.mom.left}</span>`:""}${notesBtn()}${q?"":jpill(false)}</div></div>${q?"":strip()}`;}
 function seg(n,on){return `<div class="seg" aria-hidden="true">${[...Array(n)].map((_,i)=>`<i class="${i<on?"on":""}"></i>`).join("")}</div>`;}
 function optButtons(list){return `<div class="opts">${list.map((o,i)=>`<button class="opt" data-i="${i}"><span class="k">${"ABCD"[i]}</span><span class="ot">${o.h}</span></button>`).join("")}</div>`;}
@@ -7392,12 +7394,16 @@ const okText=()=>{const r=S.run||0;return r>=10?pick(["On fire!","Unstoppable!",
 function parseNum(s){s=String(s).replace(/−/g,"-").replace(/,/g,".").replace(/[^0-9.\-eE]/g,"");const v=parseFloat(s);return isFinite(v)?v:null;}
 const near=(a,b)=>Math.abs(a-b)<=Math.max(Math.abs(b)*0.02,0.006);
 /* read the screen aloud */
+let selLast="",selGone=0;
+if(typeof document!=="undefined")document.addEventListener("selectionchange",()=>{const t=(window.getSelection()+"").trim();if(t){selLast=t;selGone=0;}else if(selLast&&!selGone)selGone=Date.now();});
+function sayState(on){document.querySelectorAll("#sayBtn").forEach(b=>b.classList.toggle("saying",on));}
 function readAloud(){
-  if(speaking){stopSpeech();return;}
-  const src=sheetEl&&sheetEl.classList.contains("show")?sheetEl:main.querySelector(".screen");if(!src)return;
-  const c=src.cloneNode(true);c.querySelectorAll(".slim,svg,.strip,.vbar,.vctrl,.k,.notelab,script,style,.lab-ctrl").forEach(x=>x.remove());
-  c.querySelectorAll(".opt").forEach((o,i)=>o.insertAdjacentText("afterbegin",` Option ${"ABCD"[i]}: `));
-  speak(c.innerText||c.textContent);
+  if(speaking){stopSpeech();sayState(false);return;}
+  let t=(window.getSelection()+"").trim();
+  if(!t&&selLast&&selGone&&Date.now()-selGone<2500)t=selLast;
+  if(!t){toast("Highlight some words first. Then press 🔊");return;}
+  t=t.replace(/\s+/g," ").slice(0,1200);
+  sayState(true);speak(t,()=>sayState(false));
 }
 
 /* ============ one renderer for every kind of question ============ */
@@ -7509,7 +7515,7 @@ function readingOptions(){
    <p class="q">Background colour</p><p class="soft small">Some people find a coloured background makes reading more comfortable. Try them and keep the one that feels best.</p>
    <div class="tints">${Object.entries(TINTS).map(([k,[n,l,d]])=>`<button class="tint ${A.tint===k?"on":""}" data-tint="${k}" aria-pressed="${A.tint===k}"><span style="background:${l||"var(--surface)"}"></span>${n}</button>`).join("")}</div>
    <label class="setrow"><input type="checkbox" role="switch" class="swi" id="o_big" ${A.big?"checked":""}><span><b>Bigger text</b><span class="soft small">Makes everything a bit larger</span></span></label>
-   <label class="setrow"><input type="checkbox" role="switch" class="swi" id="o_voice" ${A.voice?"checked":""}><span><b>Read-aloud button</b><span class="soft small">Adds a speaker button that reads the screen to you</span></span></label>
+   <label class="setrow"><input type="checkbox" role="switch" class="swi" id="o_voice" ${A.voice?"checked":""}><span><b>Read-aloud button</b><span class="soft small">Highlight words, then press 🔊 to hear them</span></span></label>
    <label class="setrow"><input type="checkbox" role="switch" class="swi" id="o_narr" ${A.narr!==false?"checked":""}><span><b>Read key notes aloud</b><span class="soft small">A voice explains each part of a key note</span></span></label>
    <label class="setrow"><input type="checkbox" role="switch" class="swi" id="o_type" ${A.type?"checked":""}><span><b>Type some answers</b><span class="soft small">Harder. When this is off, you always pick from choices</span></span></label>`;
 }
@@ -7776,6 +7782,7 @@ function renderShop(msg){
 /* ============ boot ============ */
 if(typeof document!=="undefined"&&document.getElementById("main")){
   load();applyTheme();applyA11y();
+  document.addEventListener("pointerdown",e=>{if(e.target.closest("#sayBtn"))e.preventDefault();});
   document.addEventListener("click",e=>{if(e.target.closest("#sayBtn")){readAloud();return;}const g=e.target.closest("[data-go]");if(!g)return;const t=g.dataset.go;
     if(t==="home")renderHome();if(t==="shop")renderShop();if(t==="notes")openNotes();if(t==="strength")openStrength();if(t==="lab")renderLab();if(t==="teacher")renderTeacher();if(t==="track"){closeStrength();renderTrack();}if(t==="settings")renderSettings();});
   document.getElementById("notesClose").onclick=closeNotes;document.getElementById("notesShade").onclick=()=>{closeNotes();closeStrength();};document.getElementById("strengthClose").onclick=closeStrength;
