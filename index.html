@@ -732,6 +732,9 @@ table.tdash th svg{width:18px;height:18px}table.tdash td,table.tdash th{padding:
 .dm-go{align-self:flex-start}
 .nudge{font-size:18px;line-height:1.45;margin:4px 0 8px}
 details.seeans{margin-top:6px}
+.findq{border:2px solid var(--accent);border-radius:16px;padding:12px 16px;margin:4px 0 12px;background:var(--surface)}
+.findq .fq-l{display:block;font-size:13px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:var(--accent);margin-bottom:4px}
+.findq p{margin:0;font-size:21px;line-height:1.35;font-weight:700}
 details.unitstab>summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:44px}
 details.unitstab>summary::-webkit-details-marker{display:none}
 details.unitstab>summary h3{margin:0;flex:1}
@@ -5179,7 +5182,8 @@ explainFam({topic:"space",lvl:4.3,big:["space","forces"],note:"sy4a",q:"A TV sat
 /* ============ simple demos: tap or slide, watch what happens, then answer questions ============ */
 /* cfg: s = starting state, c = controls ({seg,opts,lab} | {rng,lab,min,max,step,fmt} | {btn,act}), draw(s) = picture, out(s) = sentence */
 function demo(el,cfg){
-  const s={...cfg.s,ev:0};const C=cfg.c||[];
+  let FX={};try{FX=JSON.parse(el.dataset.o||"{}").fix||{};}catch(e){}
+  const s={...cfg.s,...FX,ev:0};const C=(cfg.c||[]).filter(c=>!((c.seg&&c.seg in FX)||(c.rng&&c.rng in FX)));
   const ctl=C.map((c,i)=>c.seg?`<div class="dm-seg" role="group" aria-label="${c.lab||"choose"}">${c.opts.map(([v,l])=>`<button type="button" class="dm-b" data-k="${c.seg}" data-v="${v}">${l}</button>`).join("")}</div>`
     :c.rng?`<label class="dm-rng"><span>${c.lab}</span><input type="range" data-k="${c.rng}" min="${c.min}" max="${c.max}" step="${c.step||1}" value="${s[c.rng]}"><b data-r="${c.rng}"></b></label>`
     :`<button type="button" class="btn primary small dm-go" data-i="${i}">${c.btn}</button>`).join("");
@@ -7014,9 +7018,12 @@ function labStage(id,o){
   if(L.pred&&st.pred==null&&!st.lab)return predictStage(id,o);
   const pc=L.pred&&st.pred!=null&&!st.lab?`<div class="predcard"><span class="notelab">Your prediction</span><p>${predStem(L.pred)} <b>${st.predH}</b></p></div>`:"";
   screen(`${noteTop(n,n.ch.length)}<p class="tag">${n.title} · try it</p>${pc}
-   <div class="labcard"><span class="notelab trylab">Try it</span><p class="small">${L.p}</p>${L.tasks?`<ul class="tasks">${L.tasks.map(x=>`<li>${x}</li>`).join("")}</ul>`:""}<div id="labArea">${L.h}</div></div>
+   ${L.q?`<div class="findq"><span class="fq-l">🔎 Find out</span><p>${L.q}</p></div>`:""}
+   <div class="labcard"><span class="notelab trylab">Try it</span><p class="small">${L.p}</p>${!L.q&&L.tasks?`<ul class="tasks">${L.tasks.map(x=>`<li>${x}</li>`).join("")}</ul>`:""}<div id="labArea">${L.h}</div></div>
    <button class="btn primary wide" id="lq" ${st.lab?"":"disabled"}>${st.lab?"Back to the key note":"Try the experiment first"}</button>`);
   const area=document.getElementById("labArea"),b=document.getElementById("lq");initLabs(area);
+  (L.hide||[]).forEach(q=>{const lock=q.startsWith("lock:");try{area.querySelectorAll(lock?q.slice(5):q).forEach(x=>{if(lock)x.style.pointerEvents="none";else x.style.display="none";});}catch(e){}});
+  if(L.hide){const lo=area.querySelector(".lab-out");if(lo&&/^(Set|Choose|Pick)/.test(lo.textContent.trim()))lo.textContent="";}
   let used=0;const use=()=>{used++;if(used>=2&&b.disabled){b.disabled=false;b.textContent="Answer the questions";}};
   area.addEventListener("click",e=>{if(e.target.closest("button"))use();});area.addEventListener("input",use);area.addEventListener("pointerup",use);
   setTimeout(()=>{if(b.disabled&&b.isConnected){b.disabled=false;b.textContent="Answer the questions";}},20000);
@@ -7078,7 +7085,7 @@ function noteChecks(id,k,o,ci=0,got=0){
   const c=pool[ci%pool.length];
   let item=c.kind?c:{q:c.q,fig:c.v,opts:mc(c.ok,c.no.map(x=>Array.isArray(x)?w(x[0],x[1]):w(x,"general")))};
   if(!c.kind&&wordable(c.q,c.ok))item=toWord(item,c.ok);
-  screen(`${noteTop(n,k==="lab"?n.ch.length:n.ch.length+1)}<p class="checklab">${k==="lab"?"Try it":"Read more"} · quick check</p><div id="qbox"></div>`);
+  screen(`${noteTop(n,k==="lab"?n.ch.length:n.ch.length+1)}<p class="checklab">${k==="lab"?(ci===0&&n.lab.q?"🔎 Your question":"Try it"):"Read more"} · quick check</p><div id="qbox"></div>`);
   renderItem(document.getElementById("qbox"),item,res=>{
     record({...item,lvl:n.lvl},noteFam(n),res.ok,{theta:false,lh:false,mem:false});
     if(res.ok){award(2);save();return sheet("good",okText(),"","Next",()=>noteChecks(id,k,o,ci+1,got+1),900);}
@@ -7797,6 +7804,98 @@ function renderShop(msg){
   main.querySelectorAll("[data-st]").forEach(b=>b.onclick=()=>{const e=b.dataset.st;const i=S.eq.stickers.indexOf(e);if(i>=0)S.eq.stickers.splice(i,1);else if(S.eq.stickers.length<8)S.eq.stickers.push(e);save();renderShop();});
   main.querySelectorAll("[data-conf]").forEach(b=>b.onclick=()=>{S.confetti=!S.confetti;save();renderShop();});
 }
+
+/* ============ one question per lab: what to find out, one thing to change ============ */
+/* q: the question at the top. how: one short line. o: lab settings. fix: demo values held still (their controls are hidden).
+   hide: parts of the older labs to hide ("lock:" = can't be dragged). ord: new order of the checks (the first answers q).
+   rw: reworded check questions. rep: replaced checks. */
+const FX_SPD=["label:has(.lab-v)",".lab-vr"],FX_FLAG=["lock:.lab-flag",".lab-hint"],FX_U=".lab-ctrl:has(.lab-u)",FX_A=".lab-ctrl:has(.lab-a)",FX_G=".plot",
+  FX_F=".lab-ctrl:has(.lab-f)",FX_S=".lab-ctrl:has(.sbtn)",FX_H=".lab-ctrl:has(.lab-h)",FX_FR="label.chk",FX_V=".lab-ctrl:has(.lab-V)",FX_M=".lab-ctrl:has(.lab-m)",FX_CUP=".lab-ctrl:has([data-cov])";
+const FOCUS={
+ sp3a:{q:"Same distance, but faster. What happens to the time?",how:"Move the speed slider. Press Go. Watch the clock.",hide:FX_FLAG},
+ sp3b:{q:"A faster speed. What does the line on the graph look like?",how:"Pick a slow speed and press Go. Then pick a fast speed."},
+ sp4a:{q:"What speed makes 60 m take 10 s?",how:"The finish is at 60 m. Change the speed and press Go until the clock says 10 s.",hide:FX_FLAG},
+ sp4b:{q:"Which is better for timing something very fast: a light gate or you?",how:"Press Go to time the trolley. Then test your own reaction time.",hide:[".lab-ctrl:has(.lab-l)",...FX_SPD]},
+ spF1:{q:"Which units do we use for distance and for time?",how:"Drag the flag. Press Go. Read the distance and the time.",o:{dots:false},hide:FX_SPD},
+ ac3a:{q:"A car speeds up. What happens to the gaps between the dots?",how:"Press Go. Watch the dots on the road.",hide:[FX_U,FX_G],ord:[1,0,2]},
+ ac4a:{q:`Acceleration 2 ${MS2}. How much faster does the car go each second?`,how:"Press Go. Watch the speed number each second.",hide:[FX_U,FX_A,FX_G],
+   rep:{1:C(`With an acceleration of 2 ${MS2}, each second the speed goes up by…`,`2 ${MS}`,[`1 ${MS}`,`4 ${MS}`])},ord:[1,0,2]},
+ ac4b:{q:"A car slows down. What does the speed-time line do?",how:"Set the acceleration to −1. Press Go. Watch the graph.",hide:[FX_U],ord:[1,0,2]},
+ acF1:{q:"A car speeds up. What happens to its speed number?",how:"Press Go. Watch the speed number at the top.",hide:[FX_U,FX_A,FX_G]},
+ fo3a:{q:"Does a bigger push make the box go faster?",how:"Try a small push, then a big push. Press the push button each time.",hide:[FX_S]},
+ fo3b:{q:"Which surface lets the box slide furthest?",how:"Press the push button on each surface. Watch how far the box goes.",o:{F:20},hide:[FX_F]},
+ fo3c:{q:"What happens when the push is smaller than the friction?",how:"Try a push of 8 N, then 20 N.",hide:[FX_S]},
+ fo4a:{q:"On ice, what does the box do after you stop pushing?",how:"Press the push button, then Stop pushing. Watch the box.",hide:[FX_F]},
+ fo4b:{q:"Take the same mass to each planet. What changes?",how:"Tap each planet. Watch the weight.",hide:[FX_M],ord:[2,0,1]},
+ foF1:{q:"What happens to the box when you stop pushing?",how:"Press the push button. Then press Stop pushing.",hide:[FX_F,FX_S],ord:[1,0]},
+ en3a:{q:"As the ball rolls down, what happens to its height energy (Ep)?",how:"Press Let go. Watch the Ep bar.",hide:[FX_H,FX_FR],rw:{2:"A bigger starting height gives the ball…"}},
+ en3b:{q:"With friction, does the ball get back up to the same height?",how:"Press Let go. Then turn friction off and try again.",hide:[FX_H]},
+ en4a:{q:"Does a bigger start height give the ball more Ep?",how:"Move the height slider. Watch the Ep bar.",hide:[FX_FR]},
+ en4b:{q:"Does a bigger start height make the ball faster at the bottom?",how:"Try 1 m, then 5 m. Read the speed at the bottom.",hide:[FX_FR],rw:{2:"With friction, the ball would reach…"}},
+ enF1:{q:"As the ball rolls down, where does its energy go?",how:"Press Let go. Watch the bars.",hide:[FX_H,FX_FR],ord:[1,0]},
+ pa3a:{q:"What happens to the particles as it warms up?",how:"Slide the temperature from cold to hot.",ord:[2,0,1]},
+ pa3b:{q:"Do hot particles move faster or slower?",how:"Compare 20 °C with 90 °C."},
+ pa4a:{q:"What are the red flashes on the walls?",how:"Watch the red flashes. Then warm the gas up.",hide:[FX_V]},
+ pa4b:{q:"Make the box smaller. What happens to the pressure?",how:"Move the volume slider. Watch the pressure.",hide:[".lab-ctrl:has(.lab-T)"],rw:{0:"Raising the temperature makes the pressure…"},ord:[1,2,0]},
+ pa5a:{q:"Which face gives the biggest pressure?",how:"Stand the block on each face. Watch how far it sinks."},
+ paF1:{q:"How do the particles sit in ice?",how:"Look at the particles. Then slide the temperature up."},
+ paF2:{q:"What happens to water when it gets very hot?",how:"Slide from very cold to very hot.",ord:[1,0]},
+ he3a:{q:"A hot block goes into cold water. What happens to the block’s temperature?",how:"Press start. Watch the block’s line."},
+ he3b:{q:"Which rod conducts heat fastest?",how:"Heat the ends. Watch which pins fall first."},
+ he3c:{q:"Which cup keeps the drink hot longest?",how:"Pick a cup and start timing. Then try the other cups."},
+ he4a:{q:"Same heater, same time. Which gets hotter: water or oil?",how:"Heat the water. Then heat the oil.",hide:[FX_M],
+   rep:{1:C("Oil heated up…","faster than water",["slower than water","the same as water"])}},
+ he4b:{q:"The graph goes flat. What is happening to the ice?",how:"Switch on. Watch for the flat part of the graph.",ord:[1,0,2]},
+ heF1:{q:"What happens to a hot drink’s temperature over time?",how:"Start the timer. Watch the thermometer.",hide:[FX_CUP,FX_G]},
+ ci3a:{q:"Which objects let electricity through?",how:"Put each object in the gap. Watch the bulb."},
+ ci3b:{q:"Break one bulb. Does the other one stay on?",how:"Break a bulb in series. Then switch to parallel and break it again."},
+ ci4a:{q:"In series, is the current the same all the way round?",how:"Read each ammeter in series.",fix:{V:6}},
+ ci4b:{q:"What happens to the current when the resistance goes up?",how:"Move the resistance slider. Watch the current.",fix:{V:12},
+   rep:{0:C("More resistance made the current…","smaller",["bigger","stay the same"])}},
+ ci4c:{q:"When does the lamp come on?",how:"Make it bright, then dark. Watch the lamp."},
+ ciF1:{q:"What does the switch do?",how:"Switch it on, then off. Watch the bulb."},
+ po3a:{q:"Which power source works in any weather?",how:"Change the weather. Watch which ones stop.",ord:[1,0,2]},
+ po3b:{q:"Which appliance uses energy fastest?",how:"Tap each appliance. Watch the energy.",fix:{t:60}},
+ po4a:{q:"A 1000 W toaster is on for 60 s. How much energy does it use?",how:"Work it out first. Then pick the toaster and 60 s to check."},
+ po4b:{q:"Do more turns of wire make a stronger magnet?",how:"Move the turns slider. Count the paper clips.",fix:{on:1,core:"iron",I:2},
+   rw:{1:"With the current off, an electromagnet…",2:"Taking out the iron core makes it…"}},
+ po4c:{q:"Does the meter move when the magnet is held still?",how:"Push the magnet in. Pull it out. Then hold it still.",fix:{sp:2},rw:{2:"Moving the magnet faster gives…"}},
+ poF1:{q:"What does each device change electricity into?",how:"Tap each device."},
+ wa3a:{q:"What does the cork do as the waves pass?",how:"Watch the cork. Then make the waves taller.",fix:{L:120}},
+ wa3b:{q:"At 3 Hz, how many waves pass each second?",how:"Set 3 Hz. Count the waves.",fix:{A:30,L:120,ty:"t"}},
+ wa4a:{q:"Turn up the frequency. What happens to the number of waves each second?",how:"Set 2 Hz. Then set 4 Hz.",fix:{A:30,L:120},ord:[1,0,2]},
+ wa4b:{q:"f = 3 Hz and λ = 2 m. What is the speed?",how:"Set the frequency and the wavelength. Read v = f λ."},
+ waF1:{q:"Does the duck move along with the ripples?",how:"Drop a stone. Watch the duck.",ord:[1,0,2]},
+ so3a:{q:"Can sound travel with no air?",how:"Ring the bell. Take the air out. Ring it again."},
+ so3b:{q:"What does a bigger amplitude sound like?",how:"Make the wave taller. Play the sound each time.",fix:{f:400}},
+ so4a:{q:"The cliff is 340 m away. How long does the echo take?",how:"Set 340 m. Shout. Read the time."},
+ so4b:{q:"Who can hear a sound of 50 000 Hz?",how:"Slide the frequency. Watch who can hear it."},
+ soF1:{q:"What do taller waves sound like?",how:"Make the wave taller. Play the sound each time.",fix:{f:400}},
+ li3a:{q:"Light goes from the lamp to the book. Where does it go next?",how:"Switch the lamp on. Follow the light.",ord:[1,0,2]},
+ li3b:{q:"How does the angle of reflection compare with the angle of incidence?",how:"Change the angle. Compare the two numbers.",ord:[1,0,2]},
+ li3c:{q:"What does a convex lens do to light?",how:"Try each lens. Watch the light rays."},
+ li3d:{q:"Red light on a green leaf. What colour does it look?",how:"The light is red. Tap each object.",fix:{L:"red"}},
+ li4a:{q:"Lightning and thunder: which arrives first?",how:"Make lightning. Watch which gets to you first."},
+ li4b:{q:"How does light stay inside the fibre?",how:"Send light down each fibre."},
+ liF1:{q:"Move the ball closer to the torch. What happens to the shadow?",how:"Move the ball. Watch the shadow.",fix:{on:1},rw:{1:"With the torch off, you would see…"}},
+ ra3a:{q:"What looks brightest in a thermal camera?",how:"Switch to the thermal camera."},
+ ra3b:{q:"Which wave cooks food?",how:"Tap each wave."},
+ ra4a:{q:"Which wave has the most energy?",how:"Tap through the waves in order.",ord:[1,0,2]},
+ ra4b:{q:"What stops beta radiation?",how:"Beta is coming out. Try each barrier.",fix:{r:"beta"},ord:[1,0,2]},
+ ra4c:{q:"Does moving further away make the dose lower?",how:"Move the distance slider. Watch the dose.",fix:{t:5,sh:0},rw:{1:"Spending longer near the source makes the dose…"}},
+ raF1:{q:"When is the sun strongest?",how:"Slide the time of day. Watch the sun.",fix:{cr:0,hat:0},rw:{1:"Sun cream and a hat make you…"}},
+ sy3a:{q:"Which planet is the biggest?",how:"Tap each planet.",ord:[1,0,2]},
+ sy3b:{q:"Go to the Moon. Does your mass change?",how:"Tap each world. Watch your mass and your weight.",fix:{m:60}},
+ sy4a:{q:"Which orbit takes the longest to go round?",how:"Try each orbit."},
+ sy4b:{q:"How long does light from the Sun take to reach us?",how:"Tap each star."},
+ syF1:{q:"At midday, which way is your side of the Earth facing?",how:"Slide the time. Watch the person on the Earth."},
+ syF1b:{q:"At 18:00, are you moving into day or night?",how:"Slide the time through a day."}
+};
+(function(){for(const id in FOCUS){const n=NOTE[id],F=FOCUS[id];if(!n||!n.lab)continue;const L=n.lab;
+  const m=L.h.match(/data-kind="(\w+)" data-o='([^']*)'/);if(m){const o={...JSON.parse(m[2]),...(F.o||{})};if(F.fix)o.fix=F.fix;L.h=labHTML(m[1],o);}
+  L.q=F.q;L.p=F.how;delete L.pred;L.tasks=null;if(F.hide)L.hide=[].concat(F.hide);
+  let c=(L.c||[]).map(x=>({...x}));if(F.rep)for(const i in F.rep)c[+i]=F.rep[i];if(F.rw)for(const i in F.rw)if(c[+i])c[+i].q=F.rw[i];
+  if(F.ord)c=F.ord.map(i=>c[i]).concat(c.filter((_,i)=>!F.ord.includes(i)));L.c=c;}})();
 
 /* ============ boot ============ */
 if(typeof document!=="undefined"&&document.getElementById("main")){
