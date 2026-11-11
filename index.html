@@ -733,7 +733,14 @@ table.tdash th svg{width:18px;height:18px}table.tdash td,table.tdash th{padding:
 .nudge{font-size:18px;line-height:1.45;margin:4px 0 8px}
 details.seeans{margin-top:6px}
 .vmore{display:block;margin-top:10px;font-weight:400}
+.sayfloat{position:fixed;right:12px;top:50%;transform:translateY(-50%);z-index:35;width:66px;height:66px;border-radius:50%;border:2px solid var(--accent);background:var(--surface);color:var(--accent);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;font:700 13px/1 inherit;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.25)}
+.sayfloat[hidden]{display:none}
+.sayfloat .ic{width:26px;height:26px;stroke:currentColor;fill:none;stroke-width:2}
+.sayfloat span{font-size:13px}
+@media (max-width:760px){.sayfloat{right:10px;top:auto;bottom:calc(14px + env(safe-area-inset-bottom,0px));transform:none;width:58px;height:58px}.sayfloat .ic{width:22px;height:22px}#main{padding-bottom:84px}
+ body:has(.sheet.show) .sayfloat{bottom:auto;top:10px}}
 #sayBtn.saying{background:var(--accent);color:#fff;border-color:var(--accent)}
+.vframe svg text{-webkit-user-select:text;user-select:text}
 .screen ::selection{background:#ffe066;color:#111}
 .vplayer .vctrl{grid-template-columns:1fr 1.4fr}
 details.seeans>summary{cursor:pointer;font-weight:700;color:var(--accent);min-height:40px;padding:8px 0}
@@ -7386,7 +7393,7 @@ planet:`<svg viewBox="0 0 24 24" class="ic"><circle cx="12" cy="12" r="5.5"/><pa
 const topicChip=t=>`<span class="tchip">${TIC[TOPIC[t].ic]}<span class="tn">${TOPIC[t].t}</span><b class="lvchip${workLevel(t)<3?" found":""}" title="${LN(workLevel(t))}">${LS(workLevel(t))}</b></span>`;
 const topicBadge=(t,big)=>`<span class="tbadge${big?" big":""}">${TIC[TOPIC[t].ic]}</span>`;
 const trackBtn=()=>`<button class="nbtn" data-go="strength" aria-label="My progress"><svg viewBox="0 0 24 24" class="ic"><path d="M5 20V12M12 20V6M19 20v-9"/></svg></button>`;
-const speakBtn=()=>S.a11y.voice?`<button class="nbtn" id="sayBtn" aria-label="Read the highlighted words aloud" title="Highlight words, then press to hear them"><svg viewBox="0 0 24 24" class="ic"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M16 9a4 4 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11"/></svg></button>`:"";
+const speakBtn=()=>"";const speakBtnTop=()=>S.a11y.voice?`<button class="nbtn" id="sayBtn" aria-label="Read the highlighted words aloud" title="Highlight words, then press to hear them"><svg viewBox="0 0 24 24" class="ic"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M16 9a4 4 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11"/></svg></button>`:"";
 function slim(mid){const q=HOLD||focusOn();return `<div class="slim"><button class="x" data-go="home" aria-label="Home">✕</button><div class="slim-mid">${mid}</div><div class="slim-r row-g">${speakBtn()}${trackBtn()}${!q&&(S.run||0)>=3?`<span class="cchip" title="Combo">🔥×${comboMult()}</span>`:""}${!q&&S.mom&&S.mom.left>0?`<span class="mchip" title="Momentum">⚡×2·${S.mom.left}</span>`:""}${notesBtn()}${q?"":jpill(false)}</div></div>${q?"":strip()}`;}
 function seg(n,on){return `<div class="seg" aria-hidden="true">${[...Array(n)].map((_,i)=>`<i class="${i<on?"on":""}"></i>`).join("")}</div>`;}
 function optButtons(list){return `<div class="opts">${list.map((o,i)=>`<button class="opt" data-i="${i}"><span class="k">${"ABCD"[i]}</span><span class="ot">${o.h}</span></button>`).join("")}</div>`;}
@@ -7499,6 +7506,10 @@ const TINTS={none:["None",null,null],cream:["Cream","#FBF4E2","#26231B"],yellow:
 function isDark(){const a=document.documentElement.getAttribute("data-theme");if(a)return a==="dark";return matchMedia("(prefers-color-scheme: dark)").matches;}
 function applyA11y(){
   if(typeof document==="undefined")return;const r=document.documentElement;const A=S.a11y;
+  let fb=document.getElementById("sayBtn");
+  if(!fb&&document.body){fb=document.createElement("button");fb.id="sayBtn";fb.className="sayfloat";fb.setAttribute("aria-label","Read the highlighted words aloud");fb.title="Highlight words, then press to hear them";
+    fb.innerHTML=`<svg viewBox="0 0 24 24" class="ic"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M16 9a4 4 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11"/></svg><span>Read</span>`;document.body.appendChild(fb);}
+  if(fb)fb.hidden=!A.voice;
   r.toggleAttribute("data-dys",!!A.dys);r.toggleAttribute("data-big",!!A.big);
   if(A.dys&&!document.getElementById("lexend")){const l=document.createElement("link");l.id="lexend";l.rel="stylesheet";l.href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;600;700&display=swap";document.head.appendChild(l);}
   const t=TINTS[A.tint]||TINTS.none;const dark=isDark();
