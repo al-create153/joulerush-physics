@@ -732,6 +732,13 @@ table.tdash th svg{width:18px;height:18px}table.tdash td,table.tdash th{padding:
 .dm-go{align-self:flex-start}
 .nudge{font-size:18px;line-height:1.45;margin:4px 0 8px}
 details.seeans{margin-top:6px}
+details.unitstab>summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:44px}
+details.unitstab>summary::-webkit-details-marker{display:none}
+details.unitstab>summary h3{margin:0;flex:1}
+details.unitstab:not([open]){padding-block:12px}
+details.unitstab>summary::after{content:"▾";font-size:22px;color:var(--accent);transition:transform .15s}
+details.unitstab[open]>summary::after{transform:rotate(180deg)}
+details.unitstab[open]>summary{margin-bottom:8px}
 .vmore{display:block;margin-top:10px;font-weight:400}
 .sayfloat{position:fixed;right:12px;top:50%;transform:translateY(-50%);z-index:35;width:66px;height:66px;border-radius:50%;border:2px solid var(--accent);background:var(--surface);color:var(--accent);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;font:700 13px/1 inherit;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.25)}
 .sayfloat[hidden]{display:none}
@@ -7604,13 +7611,14 @@ function renderHome(){
    <div class="next"><div><p class="soft small">Up next</p><h2>${nx.label}</h2><p class="soft small">${nx.why}</p></div>
     <button class="btn primary wide big-go" id="cont" ${av.length?"":"disabled"}>${S.answered?"Continue":"Start"}</button>
     ${allDone&&S.goal<4?`<div class="aim"><p><b>Ready for more?</b> You’ve reached N${S.goal} in everything you chose.</p><button class="btn small" id="aimUp">Aim for N${S.goal+1}</button></div>`:""}</div>
-   <section class="panel"><div class="row-b"><h3>My units</h3><button class="link" id="allOn">All on</button></div><p class="soft small">Switch on the units you want in your questions.</p>${includeList(false)}</section>
    ${fo?learnPanel():todayPanel()+badgePanel()}
+   <details class="panel unitstab" id="unitsTab" ${S.unitsOpen||!av.length?"open":""}><summary><h3>My units</h3><span class="soft small">${COURSE.filter(u=>u.topics.some(t=>S.on[t])).length} of ${COURSE.length} on</span></summary><div class="row-b"><p class="soft small">Switch on the units you want in your questions.</p><button class="link" id="allOn">All on</button></div>${includeList(false)}</details>
    <nav class="homelinks"><button class="btn" data-go="track">Tracking</button><button class="btn" data-go="lab">Virtual lab</button>${fo?"":`<button class="btn" data-go="shop">Shop</button>`}<button class="btn" data-go="settings">Settings</button></nav>`);
   document.getElementById("cont").onclick=startSession;if(av.length)document.getElementById("cont").focus({preventScroll:true});
   document.getElementById("allOn").onclick=()=>{TOPICS.forEach(t=>S.on[t]=true);save();renderHome();};
   const au=document.getElementById("aimUp");if(au)au.onclick=()=>{S.goal++;TOPICS.forEach(t=>S.tp[t].reached=false);resetLocks();S.units={};save();toast(`New goal: N${S.goal}`,0,{info:true});renderHome();};
   wireInclude(renderHome);
+  const ut=document.getElementById("unitsTab");if(ut)ut.ontoggle=()=>{S.unitsOpen=ut.open;save();};
   const ch=document.getElementById("chest");if(ch)ch.onclick=openChest;
   if(S.welcome){S.welcome=0;if(!fo)setTimeout(()=>{toast("👋 Welcome back! +20 J",0,{now:true});award(20,{raw:true});badge("back1");},400);}
 }
