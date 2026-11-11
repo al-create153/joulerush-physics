@@ -730,6 +730,10 @@ table.tdash th svg{width:18px;height:18px}table.tdash td,table.tdash th{padding:
 .dm-rng input{width:100%;min-height:36px}
 .dm-rng b{font-family:var(--f-mono);min-width:70px;text-align:right}
 .dm-go{align-self:flex-start}
+.nudge{font-size:18px;line-height:1.45;margin:4px 0 8px}
+details.seeans{margin-top:6px}
+.vmore{display:block;margin-top:10px;font-weight:400}
+details.seeans>summary{cursor:pointer;font-weight:700;color:var(--accent);min-height:40px;padding:8px 0}
 .include .unit.ucard{border:1.5px solid var(--hair);border-radius:16px;padding:10px 12px;background:var(--surface)}
 .include .unit.ucard:first-child{border-top:1.5px solid var(--hair);padding-top:10px}
 .include .unit.ucard.on{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 6%,var(--surface))}
@@ -3216,7 +3220,7 @@ const Q=(q,ok,no,model,o={})=>({q,ok,no,model,...o});
 function bankItem(x){
   if(x.kind)return {...x};
   const opts=x.fixed?fixed(x.fixed):mc(x.ok,x.no.map(n=>Array.isArray(n)?w(n[0],n[1],n[2]):w(n,"general")));
-  return {q:x.q,fig:typeof x.fig==="function"?x.fig():x.fig,opts,model:x.model?`<p>${x.model}</p>`:"",think:x.think,lvl:x.lvl};
+  return {q:x.q,fig:typeof x.fig==="function"?x.fig():x.fig,opts,model:x.model?`<p>${x.model}</p>`:"",think:x.think,lvl:x.lvl,nudge:x.nudge};
 }
 function bankGen(list){return focus=>{let pool=list;
   if(focus){const f=list.filter(x=>(x.no||[]).some(n=>Array.isArray(n)&&n[1]===focus)||(x.tags||[]).includes(focus));if(f.length)pool=f;}
@@ -4284,6 +4288,7 @@ Object.assign(MC,{
  "colour-adds":{n:"How colours work",fb:"A coloured object reflects its own colour and absorbs the rest. It does not make light.",y:"A red apple reflects red light",x:"A red apple makes red light"},
  "absorber-mixup":{n:"What stops each radiation",fb:"Paper stops alpha. Thin aluminium stops beta. Thick lead or concrete reduces gamma.",y:"Beta is stopped by aluminium",x:"Beta is stopped by paper"},
  "satellite-no-gravity":{n:"There is gravity in space",fb:"Gravity still pulls in space. It is what keeps the Moon and satellites in orbit.",y:"Gravity keeps the satellite in orbit",x:"There is no gravity in space"},
+ "formula-wrong":{n:"Using the wrong formula",fb:"Write the formula with the thing you want on its own. Then put the numbers in.",y:"Want V? Write V = IR first, then put the numbers in.",x:"Putting numbers together without writing the formula first."},
  "lightyear-time":{n:"A light year is a distance",fb:"A light year is how far light travels in one year. It is a distance, not a time.",y:"The star is 4 light years away",x:"A light year is a length of time"}
 });
 
@@ -4909,43 +4914,43 @@ bank({id:"sy.ideas4b",topic:"space",lvl:4.6,type:"idea",big:["space"],note:"sy4b
 
 /* ---------- calculations (N4) ---------- */
 const U_EL=["V","A","ohm","W","J"],U_PW=["W","J","s","V"],U_WV=["ms","Hz","m","s"],U_SO=["m","ms","s","Hz"];
-calcFam({id:"ci.vir4",topic:"circuits",lvl:4.6,big:["electricity","proportion"],note:"ci4b",tags:["formula-inverted","formula-multiplied"]},()=>{
+calcFam({id:"ci.vir4",topic:"circuits",lvl:4.6,big:["electricity","proportion"],note:"ci4b",tags:["formula-wrong"]},()=>{
   const plain=fadeLvl("b:ci.vir4")<3;const want=plain?"V":pick(["V","I","R"]);const I=pick([0.5,1,2,3,4,0.2,1.5]),R=pick([2,4,5,6,10,12,20,50]);const V=I*R;
   if(want==="V")return calcItem(`A current of ${fmt(I)} A flows through a ${R} Ω resistor. Calculate the voltage across it.`,{sym:"V",ans:V,unit:"V",uk:"V",K:[`I = ${fmt(I)} A`,`R = ${R} Ω`,"V = ?"],
-    F:"V = IR",Fw:[["V = I / R","formula-inverted"],["V = R / I","formula-inverted"]],sub:`V = ${fmt(I)} × ${R}`,subW:[[`V = ${fmt(I)} / ${R}`,"formula-inverted"],[`V = ${fmt(I)} + ${R}`,"general"]],wv:[[I/R,"formula-inverted"],[R/I,"formula-inverted"],[I+R,"general"]],units:U_EL});
+    F:"V = IR",Fw:[["V = I / R","formula-wrong"],["V = R / I","formula-wrong"]],sub:`V = ${fmt(I)} × ${R}`,subW:[[`V = ${fmt(I)} / ${R}`,"formula-wrong"],[`V = ${fmt(I)} + ${R}`,"general"]],wv:[[I/R,"formula-wrong"],[R/I,"formula-wrong"],[I+R,"general"]],units:U_EL});
   if(want==="I")return calcItem(`A ${fmt(V)} V supply is connected to a ${R} Ω resistor. Calculate the current.`,{sym:"I",ans:I,unit:"A",uk:"A",K:[`V = ${fmt(V)} V`,`R = ${R} Ω`,"I = ?"],
-    F:"I = V / R",Fw:[["I = VR","formula-multiplied"],["I = R / V","formula-inverted"]],sub:`I = ${fmt(V)} / ${R}`,subW:[[`I = ${fmt(V)} × ${R}`,"formula-multiplied"]],wv:[[V*R,"formula-multiplied"],[R/V,"formula-inverted"]],units:U_EL});
+    F:"I = V / R",Fw:[["I = VR","formula-wrong"],["I = R / V","formula-wrong"]],sub:`I = ${fmt(V)} / ${R}`,subW:[[`I = ${fmt(V)} × ${R}`,"formula-wrong"]],wv:[[V*R,"formula-wrong"],[R/V,"formula-wrong"]],units:U_EL});
   return calcItem(`A current of ${fmt(I)} A flows when ${fmt(V)} V is across a resistor. Calculate its resistance.`,{sym:"R",ans:R,unit:"Ω",uk:"ohm",K:[`V = ${fmt(V)} V`,`I = ${fmt(I)} A`,"R = ?"],
-    F:"R = V / I",Fw:[["R = VI","formula-multiplied"],["R = I / V","formula-inverted"]],sub:`R = ${fmt(V)} / ${fmt(I)}`,subW:[[`R = ${fmt(V)} × ${fmt(I)}`,"formula-multiplied"]],wv:[[V*I,"formula-multiplied"],[I/V,"formula-inverted"]],units:U_EL});});
-calcFam({id:"po.pet4",topic:"power",lvl:4.3,big:["energy","proportion"],note:"po4a",tags:["formula-inverted","formula-multiplied","power-energy"]},()=>{
+    F:"R = V / I",Fw:[["R = VI","formula-wrong"],["R = I / V","formula-wrong"]],sub:`R = ${fmt(V)} / ${fmt(I)}`,subW:[[`R = ${fmt(V)} × ${fmt(I)}`,"formula-wrong"]],wv:[[V*I,"formula-wrong"],[I/V,"formula-wrong"]],units:U_EL});});
+calcFam({id:"po.pet4",topic:"power",lvl:4.3,big:["energy","proportion"],note:"po4a",tags:["formula-wrong","power-energy"]},()=>{
   const plain=fadeLvl("b:po.pet4")<3;const want=plain?"P":pick(["P","E","t"]);const P=pick([20,40,60,100,500,800,1000,2000]),t=pick([5,10,20,30,60,120]);const E=P*t;const dev=pick(["lamp","heater","kettle","fan","toaster","radio"]);
   if(want==="P")return calcItem(`A ${dev} transfers ${fmt(E)} J of energy in ${t} s. Calculate its power.`,{sym:"P",ans:P,unit:"W",uk:"W",K:[`E = ${fmt(E)} J`,`t = ${t} s`,"P = ?"],
-    F:"P = E / t",Fw:[["P = Et","power-energy"],["P = t / E","formula-inverted"]],sub:`P = ${fmt(E)} / ${t}`,subW:[[`P = ${fmt(E)} × ${t}`,"power-energy"]],wv:[[E*t,"power-energy"],[t/E,"formula-inverted"]],units:U_PW});
+    F:"P = E / t",Fw:[["P = Et","power-energy"],["P = t / E","formula-wrong"]],sub:`P = ${fmt(E)} / ${t}`,subW:[[`P = ${fmt(E)} × ${t}`,"power-energy"]],wv:[[E*t,"power-energy"],[t/E,"formula-wrong"]],units:U_PW});
   if(want==="E")return calcItem(`A ${P} W ${dev} is switched on for ${t} s. Calculate the energy it transfers.`,{sym:"E",ans:E,unit:"J",uk:"J",K:[`P = ${P} W`,`t = ${t} s`,"E = ?"],
-    F:"E = Pt",Fw:[["E = P / t","formula-inverted"],["E = t / P","formula-inverted"]],sub:`E = ${P} × ${t}`,subW:[[`E = ${P} / ${t}`,"formula-inverted"]],wv:[[P/t,"formula-inverted"],[t/P,"formula-inverted"]],units:U_PW});
+    F:"E = Pt",Fw:[["E = P / t","formula-wrong"],["E = t / P","formula-wrong"]],sub:`E = ${P} × ${t}`,subW:[[`E = ${P} / ${t}`,"formula-wrong"]],wv:[[P/t,"formula-wrong"],[t/P,"formula-wrong"]],units:U_PW});
   return calcItem(`A ${P} W ${dev} transfers ${fmt(E)} J. Calculate how long it was on for.`,{sym:"t",ans:t,unit:"s",uk:"s",K:[`P = ${P} W`,`E = ${fmt(E)} J`,"t = ?"],
-    F:"t = E / P",Fw:[["t = EP","formula-multiplied"],["t = P / E","formula-inverted"]],sub:`t = ${fmt(E)} / ${P}`,subW:[[`t = ${fmt(E)} × ${P}`,"formula-multiplied"]],wv:[[E*P,"formula-multiplied"],[P/E,"formula-inverted"]],units:U_PW});});
-calcFam({id:"wa.vdt4",topic:"waves",lvl:4.1,big:["waves","proportion"],note:"wa4a",tags:["formula-inverted","formula-multiplied"]},()=>{
+    F:"t = E / P",Fw:[["t = EP","formula-wrong"],["t = P / E","formula-wrong"]],sub:`t = ${fmt(E)} / ${P}`,subW:[[`t = ${fmt(E)} × ${P}`,"formula-wrong"]],wv:[[E*P,"formula-wrong"],[P/E,"formula-wrong"]],units:U_PW});});
+calcFam({id:"wa.vdt4",topic:"waves",lvl:4.1,big:["waves","proportion"],note:"wa4a",tags:["formula-wrong"]},()=>{
   const v=pick([0.5,1,2,3,4,5,1.5]),t=pick([2,4,5,6,8,10,20]);const d=v*t;const w=pick(["A water wave","A wave on a pond","A wave on a rope","A ripple"]);
   return calcItem(`${w} travels ${fmt(d)} m in ${t} s. Calculate its speed.`,{sym:"v",ans:v,unit:MS,uk:"ms",K:[`d = ${fmt(d)} m`,`t = ${t} s`,"v = ?"],
-    F:"v = d / t",Fw:[["v = d × t","formula-multiplied"],["v = t / d","formula-inverted"]],sub:`v = ${fmt(d)} / ${t}`,subW:[[`v = ${fmt(d)} × ${t}`,"formula-multiplied"]],wv:[[d*t,"formula-multiplied"],[t/d,"formula-inverted"]],units:U_WV});});
-calcFam({id:"wa.fnt4",topic:"waves",lvl:4.2,big:["waves","proportion"],note:"wa4a",tags:["formula-inverted","formula-multiplied"]},()=>{
+    F:"v = d / t",Fw:[["v = d × t","formula-wrong"],["v = t / d","formula-wrong"]],sub:`v = ${fmt(d)} / ${t}`,subW:[[`v = ${fmt(d)} × ${t}`,"formula-wrong"]],wv:[[d*t,"formula-wrong"],[t/d,"formula-wrong"]],units:U_WV});});
+calcFam({id:"wa.fnt4",topic:"waves",lvl:4.2,big:["waves","proportion"],note:"wa4a",tags:["formula-wrong"]},()=>{
   const f=pick([2,3,4,5,10,0.5]),t=pick([2,4,5,10,20]);const N=f*t;
   return calcItem(`${fmt(N)} waves pass a buoy in ${t} s. Calculate the frequency of the waves.`,{sym:"f",ans:f,unit:"Hz",uk:"Hz",K:[`N = ${fmt(N)}`,`t = ${t} s`,"f = ?"],
-    F:"f = N / t",Fw:[["f = N × t","formula-multiplied"],["f = t / N","formula-inverted"]],sub:`f = ${fmt(N)} / ${t}`,subW:[[`f = ${fmt(N)} × ${t}`,"formula-multiplied"]],wv:[[N*t,"formula-multiplied"],[t/N,"formula-inverted"]],units:U_WV});});
-calcFam({id:"wa.vfl4",topic:"waves",lvl:4.6,big:["waves","proportion"],note:"wa4b",tags:["formula-inverted","formula-multiplied"]},()=>{
+    F:"f = N / t",Fw:[["f = N × t","formula-wrong"],["f = t / N","formula-wrong"]],sub:`f = ${fmt(N)} / ${t}`,subW:[[`f = ${fmt(N)} × ${t}`,"formula-wrong"]],wv:[[N*t,"formula-wrong"],[t/N,"formula-wrong"]],units:U_WV});});
+calcFam({id:"wa.vfl4",topic:"waves",lvl:4.6,big:["waves","proportion"],note:"wa4b",tags:["formula-wrong"]},()=>{
   const plain=fadeLvl("b:wa.vfl4")<3;const want=plain?"v":pick(["v","f","l"]);const f=pick([2,4,5,10,20,50,100,200]),l=pick([0.5,1,2,3,4,0.2,1.5]);const v=f*l;
   if(want==="v")return calcItem(`A wave has a frequency of ${f} Hz and a wavelength of ${fmt(l)} m. Calculate its speed.`,{sym:"v",ans:v,unit:MS,uk:"ms",K:[`f = ${f} Hz`,`λ = ${fmt(l)} m`,"v = ?"],
-    F:"v = f λ",Fw:[["v = f / λ","formula-inverted"],["v = λ / f","formula-inverted"]],sub:`v = ${f} × ${fmt(l)}`,subW:[[`v = ${f} / ${fmt(l)}`,"formula-inverted"],[`v = ${f} + ${fmt(l)}`,"general"]],wv:[[f/l,"formula-inverted"],[l/f,"formula-inverted"],[f+l,"general"]],units:U_WV});
+    F:"v = f λ",Fw:[["v = f / λ","formula-wrong"],["v = λ / f","formula-wrong"]],sub:`v = ${f} × ${fmt(l)}`,subW:[[`v = ${f} / ${fmt(l)}`,"formula-wrong"],[`v = ${f} + ${fmt(l)}`,"general"]],wv:[[f/l,"formula-wrong"],[l/f,"formula-wrong"],[f+l,"general"]],units:U_WV});
   if(want==="f")return calcItem(`A wave travels at ${fmt(v)} ${MS} with a wavelength of ${fmt(l)} m. Calculate its frequency.`,{sym:"f",ans:f,unit:"Hz",uk:"Hz",K:[`v = ${fmt(v)} ${MS}`,`λ = ${fmt(l)} m`,"f = ?"],
-    F:"f = v / λ",Fw:[["f = v λ","formula-multiplied"],["f = λ / v","formula-inverted"]],sub:`f = ${fmt(v)} / ${fmt(l)}`,subW:[[`f = ${fmt(v)} × ${fmt(l)}`,"formula-multiplied"]],wv:[[v*l,"formula-multiplied"],[l/v,"formula-inverted"]],units:U_WV});
+    F:"f = v / λ",Fw:[["f = v λ","formula-wrong"],["f = λ / v","formula-wrong"]],sub:`f = ${fmt(v)} / ${fmt(l)}`,subW:[[`f = ${fmt(v)} × ${fmt(l)}`,"formula-wrong"]],wv:[[v*l,"formula-wrong"],[l/v,"formula-wrong"]],units:U_WV});
   return calcItem(`A wave travels at ${fmt(v)} ${MS} with a frequency of ${f} Hz. Calculate its wavelength.`,{sym:"λ",ans:l,unit:"m",uk:"m",K:[`v = ${fmt(v)} ${MS}`,`f = ${f} Hz`,"λ = ?"],
-    F:"λ = v / f",Fw:[["λ = v f","formula-multiplied"],["λ = f / v","formula-inverted"]],sub:`λ = ${fmt(v)} / ${f}`,subW:[[`λ = ${fmt(v)} × ${f}`,"formula-multiplied"]],wv:[[v*f,"formula-multiplied"],[f/v,"formula-inverted"]],units:U_WV});});
-calcFam({id:"so.dvt4",topic:"sound",lvl:4.4,big:["waves","proportion"],note:"so4a",tags:["formula-divided","formula-inverted"]},()=>{
+    F:"λ = v / f",Fw:[["λ = v f","formula-wrong"],["λ = f / v","formula-wrong"]],sub:`λ = ${fmt(v)} / ${f}`,subW:[[`λ = ${fmt(v)} × ${f}`,"formula-wrong"]],wv:[[v*f,"formula-wrong"],[f/v,"formula-wrong"]],units:U_WV});});
+calcFam({id:"so.dvt4",topic:"sound",lvl:4.4,big:["waves","proportion"],note:"so4a",tags:["formula-wrong"]},()=>{
   const t=pick([1,2,3,4,5,6,0.5]);const water=Math.random()<0.25;const v=water?1500:340;const d=v*t;
   const q=water?`A sound travels through water at 1500 ${MS} for ${fmt(t)} s. Calculate how far it travels.`:pick([`Thunder is heard ${fmt(t)} s after the lightning. Sound travels at 340 ${MS}. Calculate how far away the storm is.`,`A sound travels at 340 ${MS} for ${fmt(t)} s. Calculate how far it travels.`]);
   return calcItem(q,{sym:"d",ans:d,unit:"m",uk:"m",K:[`v = ${v} ${MS}`,`t = ${fmt(t)} s`,"d = ?"],
-    F:"d = v t",Fw:[["d = v / t","formula-divided"],["d = t / v","formula-inverted"]],sub:`d = ${v} × ${fmt(t)}`,subW:[[`d = ${v} / ${fmt(t)}`,"formula-divided"]],wv:[[v/t,"formula-divided"],[t/v,"formula-inverted"],[v+t,"general"]],units:U_SO});});
+    F:"d = v t",Fw:[["d = v / t","formula-wrong"],["d = t / v","formula-wrong"]],sub:`d = ${v} × ${fmt(t)}`,subW:[[`d = ${v} / ${fmt(t)}`,"formula-wrong"]],wv:[[v/t,"formula-wrong"],[t/v,"formula-wrong"],[v+t,"general"]],units:U_SO});});
 
 /* ---------- key words, true or false, gaps and order for the new topics ---------- */
 const PACK4={
@@ -5634,6 +5639,200 @@ bank({id:"sy.found",topic:"space",lvl:2.2,type:"idea",big:["space"],note:"syF1"}
  Q("What goes round the Earth?","the Moon",[["the Sun","general","The Earth goes round the Sun."],["Mars","general"]],"The Moon goes round the Earth."),
  Q("It is night when your side of the Earth…","faces away from the Sun",[["faces the Sun","general"],["stops spinning","general"]],"The Earth spins, so each side has day and night.")]);
 
+/* ============ "Think about" nudges: one short question after a wrong answer, to guide without giving the answer away ============ */
+const TFN={
+ "Distance is measured in metres.":"Do you measure how far you walk with a ruler or a clock?",
+ "A stopwatch measures time.":"What do you press at the start and end of a race?",
+ "In the same time, the faster one goes further.":"A car and a bike race for 1 minute. Which gets further?",
+ "A speed of 4 m s⁻¹ means 4 metres every second.":"What does “per second” mean?",
+ "Over the same distance, the faster one takes less time.":"Who finishes a race first: the fast runner or the slow one?",
+ "A flat line on a distance-time graph means stopped.":"If the line is flat, is the distance changing?",
+ "A steeper line on a distance-time graph means faster.":"Steeper means more metres each second. Is that faster or slower?",
+ "Speed = distance ÷ time.":"Speed is metres per second. Is that metres times seconds, or metres shared by seconds?",
+ "To change minutes into seconds, multiply by 60.":"How many seconds are in one minute?",
+ "To change kilometres into metres, multiply by 1000.":"How many metres are in one kilometre?",
+ "A speedometer shows instantaneous speed.":"Does a speedometer show your speed right now, or for the whole trip?",
+ "A light gate has no reaction time.":"Does a light gate need a person to press a button?",
+ "Average speed is total distance ÷ total time.":"Average speed is about the whole trip. What do you use for the whole trip?",
+ "Speeding up means the speed gets bigger.":"When a car speeds up, does the speedometer number go up or down?",
+ "Stopped means the speed is zero.":"How fast is a parked car going?",
+ "Bigger gaps on a ticker tape mean speeding up.":"Bigger gaps mean more distance each time. Faster or slower?",
+ "A car at a steady speed is not accelerating.":"Is the speed changing?",
+ "Decelerating means slowing down.":"Is “decelerate” the opposite of “accelerate”?",
+ "Equal gaps on a ticker tape mean a steady speed.":"Equal gaps mean the same distance each time. Is the speed changing?",
+ "Acceleration = change in speed ÷ time.":"Acceleration is speed gained each second. Do you share it out or multiply?",
+ "The unit of acceleration is m s⁻².":"Which unit is for speed, and which is for acceleration?",
+ "An acceleration of 2 m s⁻² means 2 m s⁻¹ faster every second.":"Acceleration tells you how much the speed changes each second.",
+ "A flat line on a speed-time graph means a steady speed.":"If the line is flat, is the speed changing? Is it zero?",
+ "A steeper line on a speed-time graph means a bigger acceleration.":"Steeper means the speed changes faster. Is that more acceleration or less?",
+ "A line sloping down on a speed-time graph means slowing down.":"If the speed line goes down, what is happening to the speed?",
+ "A force is a push or a pull.":"When you open a door, what do you do to it?",
+ "Gravity pulls things down.":"When you drop a ball, which way does it go?",
+ "A force can change the shape of an object.":"What happens when you squeeze a sponge?",
+ "Forces are measured in newtons.":"Which unit is for force, and which is for mass?",
+ "Friction acts against the motion.":"Does friction help a sliding box keep going, or slow it down?",
+ "Friction makes surfaces warm up.":"Rub your hands together. Do they get warmer or colder?",
+ "Oil makes friction smaller.":"Why do we oil a squeaky bike chain?",
+ "Balanced forces do not change the motion.":"Two equal teams in a tug of war. Does the rope move?",
+ "Unbalanced forces change the motion.":"If one team pulls harder, what happens to the rope?",
+ "With balanced forces, a moving object keeps a steady speed.":"If nothing pushes harder in either direction, why would the speed change?",
+ "A sliding box stops because of friction.":"What force acts on the box as it slides?",
+ "Your mass is the same on the Moon.":"Do you lose any of your body on the way to the Moon?",
+ "Weight is measured in newtons.":"Weight is a force. What unit do forces use?",
+ "On Earth, each kilogram weighs 9.8 N.":"Which is bigger: gravity on Earth or on the Moon?",
+ "Your weight is smaller on the Moon.":"Is gravity stronger or weaker on the Moon?",
+ "Batteries are stores of energy.":"Why does a torch stop working when its battery is flat?",
+ "Wind is a renewable energy source.":"Will the wind ever run out?",
+ "A moving car has kinetic energy.":"Kinetic energy is the energy of moving things. Is the car moving?",
+ "A battery stores chemical energy.":"What is inside a battery: chemicals or a spinning wheel?",
+ "A stretched elastic band stores elastic energy.":"What happens when you let go of a stretched elastic band?",
+ "Energy cannot be destroyed.":"When energy seems to go, where does it end up?",
+ "Wasted energy mostly ends up as heat.":"Feel a laptop or a phone charger after a while. What do you notice?",
+ "Light from a lamp is useful energy.":"What do we want a lamp to give us?",
+ "Lifting a box higher gives it more Ep.":"Would a box dropped from higher up land harder?",
+ "A heavier box on the same shelf has more Ep.":"Which would hit the floor harder: a heavy box or a light one?",
+ "When a ball falls, its Ep turns into Ek.":"As a ball falls, does it lose height? Does it speed up?",
+ "A faster car has more Ek.":"Which crash is worse: a fast car or a slow one?",
+ "A stopped car has no Ek.":"Is a parked car moving?",
+ "A rollercoaster is fastest at the bottom.":"Where has the rollercoaster lost the most height?",
+ "Friction wastes some energy as heat.":"Rub your hands. Where does the energy go?",
+ "All matter is made of atoms.":"Is a rock made of something? Is water? Is air?",
+ "Air is matter.":"Does air take up space? Think of a balloon.",
+ "A liquid takes the shape of its container.":"Pour water into a glass. What shape is the water?",
+ "In a solid, the particles vibrate but stay in place.":"Can a solid flow? Are its particles completely still?",
+ "In a gas, the particles are far apart.":"Can you squash a gas? What does that tell you about the gaps?",
+ "Between gas particles there is empty space.":"Air is made of particles. What is between them?",
+ "Liquids flow because their particles slide past each other.":"Are liquid particles far apart, or close but able to move?",
+ "Heating makes particles move faster.":"Is a hotter thing’s particles moving faster or slower?",
+ "A solid expands when it is heated.":"Why do railway tracks have small gaps?",
+ "When a solid expands, its particles stay the same size.":"Do the particles grow, or do the gaps between them grow?",
+ "Gas pressure comes from particles hitting the walls.":"What are the gas particles doing to the inside of a balloon?",
+ "More air in a tyre means more pressure.":"Does pumping up a tyre make it harder or softer?",
+ "Heating a sealed gas makes the pressure go up.":"Hotter particles move faster. Do they hit the walls more or less?",
+ "Squashing a gas makes the pressure go up.":"Less room: do the particles hit the walls more often or less?",
+ "The same force on a smaller area gives a bigger pressure.":"Why does a sharp knife cut better than a blunt one?",
+ "Pressure is measured in pascals.":"Which unit is for force, and which is for pressure?",
+ "Water freezes at 0 °C.":"At what temperature does ice form?",
+ "A hot drink cools down in a room.":"What happens to a cup of tea if you forget it?",
+ "Heat flows from hot to cold.":"Why does an ice cube melt in your hand?",
+ "Temperature is measured in °C.":"What does a thermometer read in?",
+ "A bath at 40 °C holds more heat than a cup at 40 °C.":"Same temperature. Which has much more water in it?",
+ "Metals are good conductors of heat.":"Why do pans have plastic handles?",
+ "Convection happens in liquids and gases.":"Can the particles in a solid flow around?",
+ "Radiation can cross empty space.":"How does the Sun’s heat reach us across space?",
+ "The Sun heats the Earth by radiation.":"Space is empty. Which kind of heat travel needs no particles?",
+ "Trapped air is a good insulator.":"Why does a woolly jumper keep you warm?",
+ "Insulation keeps cold things cold.":"How does a cool bag keep a drink cold?",
+ "More water needs more energy to heat up.":"Which boils first: a full kettle or a half-full one?",
+ "A bigger temperature rise needs more energy.":"Does heating water to 80 °C take longer than to 50 °C?",
+ "Water needs more energy than oil to warm up.":"Same heater, same mass. Which gets hotter first?",
+ "In a fair test, you change only one thing.":"If you change two things, how do you know which one made the difference?",
+ "While ice melts, its temperature stays at 0 °C.":"What is the energy doing while the ice melts?",
+ "Water boils at 100 °C.":"At what temperature does a kettle boil?",
+ "During melting, the energy pulls the particles apart.":"Why doesn’t the temperature rise while ice melts?",
+ "A bulb lights only if the circuit is complete.":"Can electricity jump across a gap in the wire?",
+ "Copper is a conductor.":"What are the insides of wires made of?",
+ "Plastic is an insulator.":"Why are wires covered in plastic?",
+ "An open switch turns a circuit off.":"An open switch leaves a gap. Can electricity flow?",
+ "In series, if one bulb breaks, they all go out.":"In series, how many loops are there?",
+ "House lights are wired in parallel.":"When one bulb at home blows, do all the others go out?",
+ "Current is measured in amps.":"Which unit is for current, and which is for voltage?",
+ "An ammeter goes in series.":"Does the current need to flow through the ammeter?",
+ "A voltmeter goes across the part.":"Does a voltmeter go in the loop, or beside the part?",
+ "In series, the current is the same everywhere.":"Does current get used up by a bulb?",
+ "More resistance means less current.":"Resistance makes it harder for current to flow. More or less current?",
+ "An LDR has less resistance in bright light.":"Does light make it easier or harder for current to flow through an LDR?",
+ "A microphone is an input device.":"Does a microphone sense sound, or make sound?",
+ "A buzzer is an output device.":"Does a buzzer sense something, or do something?",
+ "A torch uses a battery.":"Can you carry a torch somewhere without needing to plug it in?",
+ "A switch turns a light on and off.":"What do you press when you walk into a dark room?",
+ "Mains electricity is dangerous.":"Why do sockets have warning signs and covers?",
+ "Coal will run out one day.":"Can we make more coal quickly?",
+ "Wind is a renewable source.":"Will the wind ever run out?",
+ "Burning fossil fuels releases carbon dioxide.":"What gas comes out of a car exhaust?",
+ "Solar panels do not work at night.":"What do solar panels need to make electricity?",
+ "Power is measured in watts.":"What number is written on a light bulb?",
+ "A 2000 W kettle uses more energy each second than a 60 W bulb.":"Which number is bigger: 2000 or 60?",
+ "P = E / t.":"Power is energy each second. Do you share the energy out, or multiply?",
+ "1 kW is 1000 W.":"What does “kilo” mean? Think of kilometre.",
+ "More turns of wire make an electromagnet stronger.":"Would a coil with more turns pick up more paper clips?",
+ "An electromagnet switches off when the current stops.":"Why does a scrapyard crane drop the car?",
+ "Moving a magnet in a coil makes a voltage.":"Does a bike dynamo work when the wheel is still?",
+ "The National Grid uses high voltage to waste less energy.":"High voltage means a smaller current. Does that heat the cables more or less?",
+ "A kettle gives out heat.":"What does a kettle do to the water?",
+ "A fan gives out movement.":"What do the blades of a fan do?",
+ "Switching off saves energy.":"Does a light use energy when it is off?",
+ "Waves carry energy.":"Big waves can knock you over. What must they carry?",
+ "Wavelength is crest to crest.":"Wavelength is the length of one wave. Where does one wave start and end?",
+ "The trough is the bottom of a wave.":"Is the crest the top or the bottom?",
+ "Frequency is measured in hertz.":"Which unit is for frequency, and which is for wavelength?",
+ "Light is a transverse wave.":"Do light’s vibrations go across the wave or along it?",
+ "Sound is a longitudinal wave.":"Think of a slinky being pushed and pulled. Is that like sound?",
+ "Wave speed = distance ÷ time.":"Speed is metres per second. Do you share or multiply?",
+ "v = f λ.":"More waves each second, each one long. Does that make the wave faster?",
+ "Same speed, higher frequency means shorter wavelength.":"If more waves pass each second at the same speed, can each one be as long?",
+ "Ripples on a pond are waves.":"What spreads out when you drop a stone in a pond?",
+ "Sound travels as a wave.":"Sound and light both travel as one thing. What is it?",
+ "All sounds are made by vibrations.":"Put your hand on your throat and hum. What do you feel?",
+ "Sound cannot travel through space.":"Is there any air in space to carry the sound?",
+ "Sound travels fastest in solids.":"In which state are the particles closest together?",
+ "A bigger amplitude gives a louder sound.":"Hit a drum harder. Is it louder or higher?",
+ "A higher frequency gives a higher pitch.":"Is a whistle high or low? Does it vibrate fast or slow?",
+ "Sound level is measured in decibels.":"Which unit is for loudness, and which is for frequency?",
+ "Light travels faster than sound.":"In a storm, which comes first: the flash or the bang?",
+ "An echo is a reflected sound.":"Where does an echo come back from?",
+ "Ultrasound is too high for humans to hear.":"Can you hear a dog whistle?",
+ "Ultrasound is used to scan babies.":"Which is safer for a baby: sound or X-rays?",
+ "We hear with our ears.":"Which part of your body do you cover when it is too loud?",
+ "A whistle makes a high sound.":"Is a whistle more like a bird or a big drum?",
+ "Sounds come from vibrations.":"What does a guitar string do when you pluck it?",
+ "Light travels in straight lines.":"Why can’t you see round a corner?",
+ "The Moon reflects light from the Sun.":"Does the Moon make its own light, or bounce the Sun’s?",
+ "We see things when light enters our eyes.":"Can you see anything in a completely dark room?",
+ "The angle of incidence equals the angle of reflection.":"How does a ball bounce off a wall?",
+ "Refraction is light bending.":"Why does a straw in water look bent?",
+ "A convex lens brings light together.":"How does a magnifying glass make a hot spot in the sun?",
+ "White light is a mix of colours.":"What does a prism do to white light?",
+ "A red apple reflects red light.":"An apple doesn’t glow in the dark. So where does its red light come from?",
+ "Light can travel through a vacuum.":"How does sunlight reach us across empty space?",
+ "The speed of light is 300 000 000 m s⁻¹.":"Light is much faster than sound. Is 340 m s⁻¹ fast enough?",
+ "Short sight is corrected by a concave lens.":"Short sight blurs far things. Which lens spreads light out?",
+ "We need light to see.":"What can you see in a completely dark room?",
+ "A candle is a light source.":"Does a candle flame make its own light?",
+ "A shadow forms when light is blocked.":"Why is there a dark patch behind you on a sunny day?",
+ "Hot objects give out infrared.":"How can you feel a radiator without touching it?",
+ "UV can cause sunburn.":"What does sun cream protect you from?",
+ "Microwaves are used in mobile phones.":"Phones and microwave ovens use the same kind of wave. Which?",
+ "X-rays pass through skin but not bone.":"Why do bones show up white on an X-ray picture?",
+ "All electromagnetic waves travel at the speed of light.":"Light is one of the family. Do they all share its speed?",
+ "Gamma rays have the shortest wavelength.":"Which end of the spectrum has the most energy?",
+ "Gamma rays are used to treat cancer.":"Which waves have enough energy to kill cancer cells?",
+ "Paper stops alpha radiation.":"Which radiation is the easiest to stop?",
+ "Ionisation can damage living cells.":"Why do people who work with radiation wear badges and shields?",
+ "Most background radiation is natural.":"Where does most of it come from: rocks and space, or phones?",
+ "Keeping your distance makes radiation safer.":"Why do scientists move sources with long tongs?",
+ "The Sun gives us light and heat.":"How do you feel when you stand in the sunshine?",
+ "Too much sun can burn your skin.":"Why do we wear sun cream on a hot day?",
+ "You can feel heat from a fire without touching it.":"Can you feel the warmth of a campfire from your seat?",
+ "The Sun is a star.":"Does the Sun make its own light?",
+ "The Earth spins once a day.":"How long is it from one sunrise to the next?",
+ "The Earth orbits the Sun once a year.":"How long is it from one birthday to the next?",
+ "The Moon orbits the Earth.":"Which is smaller: the Moon or the Earth?",
+ "Gravity keeps the planets in orbit.":"What pulls the planets towards the Sun?",
+ "Your mass is the same on the Moon.":"Do you lose any of your body on the way to the Moon?",
+ "The Moon is a natural satellite.":"Did people make the Moon?",
+ "A geostationary satellite takes 24 hours to orbit.":"It stays above the same place. How long does the Earth take to spin?",
+ "Higher satellites take longer to orbit.":"Does the Moon go round faster or slower than a low satellite?",
+ "A light year is a distance.":"It is how far light goes in a year. Is that a time or a distance?",
+ "A galaxy is a group of stars.":"Is the Milky Way one star or billions?",
+ "The Earth is a planet.":"Does the Earth make its own light, like a star?",
+ "The Moon goes round the Earth.":"Which is smaller: the Moon or the Earth?",
+ "Day and night happen because the Earth spins.":"Does the Sun switch off at night?",
+ "The Earth spins once every 24 hours.":"How many hours are in one day?"
+};
+/* nudges for other kinds of question */
+const KN={gap:"Read it again with your words in. Does it make sense?",order:"What has to happen first?",kw:"Say the word out loud. What does it remind you of?",calc:"Check each line: K, then F, then C."};
+
 /* ============ key words, true or false, fill the gaps, put in order ============ */
 /* terms: [word, meaning, key note]. tf: [true statement, false statement, why, key note]. gap: [text with [gaps], spare words, key note]. order: [question, steps, key note, level].
    A question only comes up once its key note is done, or if it belongs to the first note of that level. */
@@ -5827,14 +6026,14 @@ TOPICS.forEach(t=>{const P=PACK[t];if(!P)return;
     const tn=firstOf(P.tf,3);
     if(tn)fam({id:`tf.${t}${nm}`,topic:t,lvl:base+0.2,type:"idea",big:PBIG[t],note:tn,gen:()=>{
       const x=pick(packPool(P.tf,3,L,tn));const isT=Math.random()<0.5;
-      return {lab:"True or false",q:`True or false?<div class="stmt">${isT?x[0]:x[1]}</div>`,opts:fixed([["True",isT,"general"],["False",!isT,"general"]]),
-        model:`<p><b>${isT?"True":"False"}.</b> ${x[2]}</p>${isT?"":`<p>The true version: <b>${x[0]}</b></p>`}`};}});
+      return {lab:"True or false",q:`True or false?<div class="stmt">${isT?x[0]:x[1]}</div>`,opts:fixed([["True",isT,"general"],["False",!isT,"general"]]),nudge:x[4]||TFN[x[0]],
+        model:`<p><b>${isT?"True":"False"}.</b> ${isT?x[2]:x[0]}</p>`};}});
     const gn=firstOf(P.gap,2);
     if(gn)fam({id:`gp.${t}${nm}`,topic:t,lvl:base+0.4,type:"idea",big:PBIG[t],note:gn,gen:()=>{
       const x=pick(packPool(P.gap,2,L,gn));const parts=x[0].split(/\[([^\]]+)\]/);
-      return {kind:"gap",lab:"Fill the gaps",q:"Tap the words to fill the gaps.",parts,ans:parts.filter((_,i)=>i%2),extra:x[1],model:`<p>${x[0].replace(/\[([^\]]+)\]/g,"<b>$1</b>")}</p>`};}});
+      return {kind:"gap",nudge:KN.gap,lab:"Fill the gaps",q:"Tap the words to fill the gaps.",parts,ans:parts.filter((_,i)=>i%2),extra:x[1],model:`<p>${x[0].replace(/\[([^\]]+)\]/g,"<b>$1</b>")}</p>`};}});
   });
-  (P.order||[]).forEach(([q,steps,n,lvl],i)=>fam({id:`or.${t}${i+1}`,topic:t,lvl,type:"idea",big:PBIG[t],note:n,gen:()=>({kind:"order",lab:"Put in order",q,cards:steps,prose:true,orderTag:"general",
+  (P.order||[]).forEach(([q,steps,n,lvl],i)=>fam({id:`or.${t}${i+1}`,topic:t,lvl,type:"idea",big:PBIG[t],note:n,gen:()=>({kind:"order",nudge:KN.order,lab:"Put in order",q,cards:steps,prose:true,orderTag:"general",
     model:`<p>${steps.map((s,k)=>`${k+1}. ${s}`).join("<br>")}</p>`})}));
 });
 
@@ -6649,9 +6848,9 @@ function answered(res){
   const retry=meta.ctx!=="retry"&&item.kind!=="write"&&!meta.gapNote&&!!FAM[goF];
   const cont=()=>{if(meta.ctx==="fixup")sess.fix=null;S.skipped=(S.skipped||0)+1;
     if(retry)sess.pending=[{type:"retry",fam:goF,focus:tag!=="general"&&FAM[goF].tags.includes(tag)?tag:null}];save();next();};
-  sheetChoice("bad",item.kind==="write"?"Compare with the model answer.":"Not yet. You can fix this.",wrongBody(item,res),
+  sheetChoice("bad",item.kind==="write"?"Compare with the model answer.":"Not yet.",wrongBody(item,res),
     [{label:"Study again",fn:study,primary:repeat},{label:"Continue on",fn:cont,primary:!repeat}],
-    repeat?`This mistake has come up more than once. <b>Study again</b> is a good idea.`:retry?`<b>Continue on</b> gives you one more go.`:"");
+    repeat?`This keeps coming up. Try <b>Study again</b>.`:retry?`<b>Continue on</b> for one more go.`:"");
 }
 function celebrate(e){
   const fo=focusOn();const J=n=>fo?"":` · +${n} J`;
@@ -6752,12 +6951,11 @@ function watch(id,o,ci,si){
     <div class="vbar" id="vbar" aria-hidden="true"></div>
     <div class="vctrl"><button class="vbtn" id="vprev">◀ Back</button><button class="vbtn" id="vre">↻ Replay</button><button class="vbtn main" id="vnext">Next ▶</button><button class="vbtn snd" id="vsound" aria-label="Sound">${S.vmute?"🔇":"🔊"}</button></div></div>`);
   const frame=document.getElementById("vframe"),cap=document.getElementById("vcap"),bar=document.getElementById("vbar"),nx=document.getElementById("vnext"),pv=document.getElementById("vprev");
-  let tok=0;const ch=n.ch[ci];
+  let tok=0,shortNow=false;const ch=n.ch[ci];
   const show=()=>{tok++;const my=tok;stopSpeech();const [c,f,opt={}]=ch.sc[si];frame.innerHTML=fracify(typeof f==="function"?f():f);
     /* With sound on, the screen shows the key point and the voice explains (no word-for-word repeat). With sound off, or in dyslexia mode, the full words show. */
     const sound=!S.vmute&&!!window.speechSynthesis,shortCap=sound&&!S.a11y.dys;
-    cap.innerHTML=fracify(shortCap?`<b>${ch.pt}</b>`:c)+(shortCap?` <button class="link capmore" id="capmore">Show all the words</button>`:"");
-    const cm=document.getElementById("capmore");if(cm)cm.onclick=()=>{cap.innerHTML=fracify(c);};
+    shortNow=shortCap;cap.innerHTML=fracify(shortCap?`<b>${ch.pt}</b>`:c);
     const svg=frame.querySelector("svg");
     if(svg)try{if(reduce()){svg.setCurrentTime(30);svg.pauseAnimations();}else{svg.pauseAnimations();svg.setCurrentTime(0);}}catch(e){}
     const plain=norm(c),est=sound?plain.split(" ").length/2.4:Math.min(8,plain.length/15);let started=false,gotB=false,cueT=null;
@@ -6767,14 +6965,15 @@ function watch(id,o,ci,si){
         const step=()=>{if(my!==tok||!svg.isConnected)return;const el=(performance.now()-tA)/1000*r;try{svg.setCurrentTime(el);}catch(e){}if(el<nat+0.6)requestAnimationFrame(step);};requestAnimationFrame(step);}
       else{try{svg.unpauseAnimations();}catch(e){}}};
     const cueAt=opt.cue?plain.indexOf(norm(opt.cue)):-1,frac=cueAt>0?cueAt/plain.length:0;
-    cueT=setTimeout(()=>{if(!gotB||!sound)start();},cueAt>0?Math.max(300,(sound?est*frac:Math.min(3,cueAt/16))*1000):(sound?250:400));
+    cueT=setTimeout(start,cueAt>0?Math.max(300,(sound?est*frac:Math.min(3,cueAt/16))*1000):(sound?250:400));
     bar.innerHTML=ch.sc.length>1?ch.sc.map((_,j)=>`<i class="${j<si?"on":j===si?"now":""}"></i>`).join(""):"";
     pv.disabled=ci===0&&si===0;
-    const last=si===ch.sc.length-1;nx.textContent=!last?"Next ▶":st.ck[ci]!==1?"Quick check ▶":ci<n.ch.length-1?"Next part ▶":"Next ▶";
+    const last=si===ch.sc.length-1;nx.textContent=shortNow||!last?"Next ▶":st.ck[ci]!==1?"Quick check ▶":ci<n.ch.length-1?"Next part ▶":"Next ▶";
     nx.classList.remove("ready");const t0=Date.now(),minT=Math.max(2200,norm(c).split(" ").length*280);
     const ready=()=>{if(my===tok)setTimeout(()=>{if(my===tok)nx.classList.add("ready");},Math.max(300,minT-(Date.now()-t0)));};
     if(sound)speak(c,()=>{start();ready();},(ci_,txt)=>{gotB=true;if(cueAt<=0||ci_/Math.max(1,txt.length)>=frac-0.02)start();});else ready();};
-  nx.onclick=()=>{if(si<ch.sc.length-1){si++;return show();}stopSpeech();if(st.ck[ci]!==1)return chunkCheck(id,o,ci,0,0);if(ci<n.ch.length-1)return watch(id,o,ci+1,0);afterWatch(id,o);};
+  nx.onclick=()=>{if(shortNow){shortNow=false;cap.innerHTML=fracify(`<b>${ch.pt}</b><span class="vmore">${ch.sc[si][0]}</span>`);const last=si===ch.sc.length-1;nx.textContent=!last?"Next ▶":st.ck[ci]!==1?"Quick check ▶":ci<n.ch.length-1?"Next part ▶":"Next ▶";return;}
+    if(si<ch.sc.length-1){si++;return show();}stopSpeech();if(st.ck[ci]!==1)return chunkCheck(id,o,ci,0,0);if(ci<n.ch.length-1)return watch(id,o,ci+1,0);afterWatch(id,o);};
   pv.onclick=()=>{if(si>0){si--;return show();}if(ci>0){stopSpeech();watch(id,o,ci-1,n.ch[ci-1].sc.length-1);}};
   document.getElementById("vre").onclick=show;
   document.getElementById("vsound").onclick=e=>{S.vmute=!S.vmute;save();e.currentTarget.textContent=S.vmute?"🔇":"🔊";if(S.vmute)stopSpeech();else speak(ch.sc[si][0]);};
@@ -7232,10 +7431,10 @@ function renderItem(box,it,cb){
     chk.onclick=goE;inp.onkeydown=e=>{if(e.key==="Enter"){e.preventDefault();e.stopPropagation();goE();}};inp.focus({preventScroll:true});return;}
   if(kind==="mc"){let t1=null;box.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{const i=+b.dataset.i;const o=it.opts[i];
     /* a first wrong choice from three or more gets a hint and one more go */
-    if(!o.ok&&it.try2&&!t1&&it.opts.length>=3){t1=o;b.disabled=true;b.classList.add("no");const hint=o.why||(o.tag&&o.tag!=="general"&&MC[o.tag]&&MC[o.tag].fb)||"Read each choice again, slowly.";
+    if(!o.ok&&it.try2&&!t1&&it.opts.length>=3){t1=o;b.disabled=true;b.classList.add("no");const hint=o.why||(it.nudge?"Think about: "+it.nudge:"")||(it.calc?KN.calc:"")||(o.tag&&o.tag!=="general"&&MC[o.tag]&&MC[o.tag].fb)||"Read each choice again, slowly.";
       box.insertAdjacentHTML("beforeend",fracify(`<div class="try2" role="status"><b>Not quite. Have one more go.</b><p>💡 ${hint}</p></div>`));const nb=box.querySelector(".opt:not([disabled])");if(nb)nb.focus({preventScroll:true});return;}
     box.querySelectorAll(".opt").forEach((x,j)=>{x.disabled=true;x.classList.add(it.opts[j].ok?"ok":(j===i||it.opts[j]===t1)?"no":"dim");});
-    fin({ok:o.ok&&!t1,second:!!(o.ok&&t1),tag:t1?t1.tag:o.tag,ans:it.opts.find(x=>x.ok).h});});}
+    fin({ok:o.ok&&!t1,second:!!(o.ok&&t1),tag:t1?t1.tag:o.tag,why:o.why||(t1&&t1.why),ans:it.opts.find(x=>x.ok).h});});}
   if(kind==="gap"){const words=it._w,fill=it.ans.map(()=>null);let sel=0,tries=0;const slots=[...box.querySelectorAll(".slot")],wb=[...box.querySelectorAll(".wchip")],chk=box.querySelector("#check"),gfb=box.querySelector("#gfb");
     const draw=()=>{slots.forEach((s,i)=>{s.innerHTML=fill[i]===null?"&nbsp;":words[fill[i]];s.classList.toggle("fill",fill[i]!==null);s.classList.toggle("cur",i===sel&&!done);});wb.forEach((b,i)=>b.disabled=done||fill.includes(i));chk.disabled=!fill.every(x=>x!==null);};
     slots.forEach((s,i)=>s.onclick=()=>{if(done)return;fill[i]=null;sel=i;s.classList.remove("ok","no");draw();});
@@ -7273,6 +7472,12 @@ function renderItem(box,it,cb){
     chk.onclick=go;inp.onkeydown=e=>{if(e.key==="Enter"){e.preventDefault();e.stopPropagation();go();}};}
 }
 function wrongBody(it,res,short){
+  if(it.kind!=="write"){
+    const tagFb=res.tag&&res.tag!=="general"&&MC[res.tag]?MC[res.tag].fb:"";const isCalc=!!(it.calc||it.kind==="exam"||it.kind==="type"||it.spot);
+    const hint=it.nudge?`<p class="nudge"><b>Think about:</b> ${it.nudge}</p>`:isCalc?`<p class="nudge">💡 ${KN.calc}</p>`:res.why?`<p class="nudge">💡 ${res.why}</p>`:tagFb?`<p class="nudge">💡 ${tagFb}</p>`:isCalc?`<p class="nudge">💡 ${KN.calc}</p>`:"";
+    const where=res.where&&(it.explain||it.kind==="build")?`<p>Look again at <b>${res.where}</b>.</p>`:"";
+    const model=it.model||it.tip||"";const more=(res.ans&&!/<div|<p/.test(res.ans)?`<p>Answer: <b>${res.ans}</b></p>`:"")+(model?`<div class="model">${model}</div>`:"");
+    return `${where}${hint}${more?`<details class="seeans"><summary>See the answer</summary>${more}</details>`:""}`;}
   const fb=(MC[res.tag]&&MC[res.tag].fb)||MC.general.fb;
   if(it.kind==="write")return `<p class="eyebrowish">Model answer</p><div class="modelans">${it.model}</div><p class="soft small">You matched ${res.pts||0} of the ${it.need} marking points needed. Read the model answer, then try writing it in your own words next time.</p>`;
   if(it.explain)return `<p>Your first mistake was in <b>${res.where}</b>.</p><p>${fb}</p>${it.model}`;
