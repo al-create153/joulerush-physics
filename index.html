@@ -733,6 +733,7 @@ table.tdash th svg{width:18px;height:18px}table.tdash td,table.tdash th{padding:
 .nudge{font-size:18px;line-height:1.45;margin:4px 0 8px}
 details.seeans{margin-top:6px}
 .vmore{display:block;margin-top:10px;font-weight:400}
+.vplayer .vctrl{grid-template-columns:1fr 1.4fr}
 details.seeans>summary{cursor:pointer;font-weight:700;color:var(--accent);min-height:40px;padding:8px 0}
 .include .unit.ucard{border:1.5px solid var(--hair);border-radius:16px;padding:10px 12px;background:var(--surface)}
 .include .unit.ucard:first-child{border-top:1.5px solid var(--hair);padding-top:10px}
@@ -1155,7 +1156,7 @@ function freshTopic(L){return {th:(L||4)+0.5,n:0,lh:{2:[],3:[],4:[],5:[]},cc:[],
 function fresh(){
   const tp={};TOPICS.forEach(t=>tp[t]=freshTopic(3));
   return {v:1,setup:false,name:"",goal:4,start:3,on:Object.fromEntries(TOPICS.map(t=>[t,false])),paced:false,
-   a11y:{dys:false,big:false,tint:"none",voice:true,type:false},
+   a11y:{dys:false,big:false,tint:"none",voice:true,narr:true,type:false},
    tp,recent:[],big:{},bigT:{},bigF:{},mem:{},noteRev:{},we:{},cls:"",focus:false,focusPin:"",held:0,tags:{},notes:{},nb:[],blockNo:0,answered:0,units:{},
    j:0,earned:0,owned:{},eq:{theme:"cobalt",trail:"dot",stickers:[],title:""},boost:0,confetti:false,badges:{},run:0,
    day:null,streak:{n:0,last:"",best:0},freezes:0,chests:0,chestProg:0,mom:null,fade:{}};
@@ -6949,13 +6950,13 @@ function watch(id,o,ci,si){
   screen(`${noteTop(n,ci)}<p class="tag">${n.title} · part ${ci+1} of ${n.ch.length}</p>
    <div class="vplayer"><div class="vframe" id="vframe"></div><p class="vcap" id="vcap" aria-live="polite"></p>
     <div class="vbar" id="vbar" aria-hidden="true"></div>
-    <div class="vctrl"><button class="vbtn" id="vprev">◀ Back</button><button class="vbtn" id="vre">↻ Replay</button><button class="vbtn main" id="vnext">Next ▶</button><button class="vbtn snd" id="vsound" aria-label="Sound">${S.vmute?"🔇":"🔊"}</button></div></div>`);
+    <div class="vctrl"><button class="vbtn" id="vprev">◀ Back</button><button class="vbtn main" id="vnext">Next ▶</button></div></div>`);
   const frame=document.getElementById("vframe"),cap=document.getElementById("vcap"),bar=document.getElementById("vbar"),nx=document.getElementById("vnext"),pv=document.getElementById("vprev");
-  let tok=0,shortNow=false;const ch=n.ch[ci];
+  let tok=0,shortNow=false,wasShort=false;const ch=n.ch[ci];
   const show=()=>{tok++;const my=tok;stopSpeech();const [c,f,opt={}]=ch.sc[si];frame.innerHTML=fracify(typeof f==="function"?f():f);
     /* With sound on, the screen shows the key point and the voice explains (no word-for-word repeat). With sound off, or in dyslexia mode, the full words show. */
-    const sound=!S.vmute&&!!window.speechSynthesis,shortCap=sound&&!S.a11y.dys;
-    shortNow=shortCap;cap.innerHTML=fracify(shortCap?`<b>${ch.pt}</b>`:c);
+    const sound=!S.vmute&&S.a11y.narr!==false&&!!window.speechSynthesis,shortCap=sound&&!S.a11y.dys;
+    shortNow=shortCap;wasShort=shortCap;cap.innerHTML=fracify(shortCap?`<b>${ch.pt}</b>`:c);
     const svg=frame.querySelector("svg");
     if(svg)try{if(reduce()){svg.setCurrentTime(30);svg.pauseAnimations();}else{svg.pauseAnimations();svg.setCurrentTime(0);}}catch(e){}
     const plain=norm(c),est=sound?plain.split(" ").length/2.4:Math.min(8,plain.length/15);let started=false,gotB=false,cueT=null;
@@ -6972,11 +6973,9 @@ function watch(id,o,ci,si){
     nx.classList.remove("ready");const t0=Date.now(),minT=Math.max(2200,norm(c).split(" ").length*280);
     const ready=()=>{if(my===tok)setTimeout(()=>{if(my===tok)nx.classList.add("ready");},Math.max(300,minT-(Date.now()-t0)));};
     if(sound)speak(c,()=>{start();ready();},(ci_,txt)=>{gotB=true;if(cueAt<=0||ci_/Math.max(1,txt.length)>=frac-0.02)start();});else ready();};
-  nx.onclick=()=>{if(shortNow){shortNow=false;cap.innerHTML=fracify(`<b>${ch.pt}</b><span class="vmore">${ch.sc[si][0]}</span>`);const last=si===ch.sc.length-1;nx.textContent=!last?"Next ▶":st.ck[ci]!==1?"Quick check ▶":ci<n.ch.length-1?"Next part ▶":"Next ▶";return;}
+  nx.onclick=()=>{if(shortNow){shortNow=false;pv.disabled=false;cap.innerHTML=fracify(`<b>${ch.pt}</b><span class="vmore">${ch.sc[si][0]}</span>`);const last=si===ch.sc.length-1;nx.textContent=!last?"Next ▶":st.ck[ci]!==1?"Quick check ▶":ci<n.ch.length-1?"Next part ▶":"Next ▶";return;}
     if(si<ch.sc.length-1){si++;return show();}stopSpeech();if(st.ck[ci]!==1)return chunkCheck(id,o,ci,0,0);if(ci<n.ch.length-1)return watch(id,o,ci+1,0);afterWatch(id,o);};
-  pv.onclick=()=>{if(si>0){si--;return show();}if(ci>0){stopSpeech();watch(id,o,ci-1,n.ch[ci-1].sc.length-1);}};
-  document.getElementById("vre").onclick=show;
-  document.getElementById("vsound").onclick=e=>{S.vmute=!S.vmute;save();e.currentTarget.textContent=S.vmute?"🔇":"🔊";if(S.vmute)stopSpeech();else speak(ch.sc[si][0]);};
+  pv.onclick=()=>{if(wasShort&&!shortNow)return show();if(si>0){si--;return show();}if(ci>0){stopSpeech();watch(id,o,ci-1,n.ch[ci-1].sc.length-1);}};
   show();nx.focus({preventScroll:true});
 }
 function chunkCheck(id,o,ci,qi,tries){
@@ -7511,11 +7510,12 @@ function readingOptions(){
    <div class="tints">${Object.entries(TINTS).map(([k,[n,l,d]])=>`<button class="tint ${A.tint===k?"on":""}" data-tint="${k}" aria-pressed="${A.tint===k}"><span style="background:${l||"var(--surface)"}"></span>${n}</button>`).join("")}</div>
    <label class="setrow"><input type="checkbox" role="switch" class="swi" id="o_big" ${A.big?"checked":""}><span><b>Bigger text</b><span class="soft small">Makes everything a bit larger</span></span></label>
    <label class="setrow"><input type="checkbox" role="switch" class="swi" id="o_voice" ${A.voice?"checked":""}><span><b>Read-aloud button</b><span class="soft small">Adds a speaker button that reads the screen to you</span></span></label>
+   <label class="setrow"><input type="checkbox" role="switch" class="swi" id="o_narr" ${A.narr!==false?"checked":""}><span><b>Read key notes aloud</b><span class="soft small">A voice explains each part of a key note</span></span></label>
    <label class="setrow"><input type="checkbox" role="switch" class="swi" id="o_type" ${A.type?"checked":""}><span><b>Type some answers</b><span class="soft small">Harder. When this is off, you always pick from choices</span></span></label>`;
 }
 function wireReading(rerender){
   const A=S.a11y;
-  [["o_dys","dys"],["o_big","big"],["o_voice","voice"],["o_type","type"]].forEach(([id,k])=>{const el=document.getElementById(id);if(el)el.onchange=()=>{A[k]=el.checked;save();applyA11y();};});
+  [["o_dys","dys"],["o_big","big"],["o_voice","voice"],["o_narr","narr"],["o_type","type"]].forEach(([id,k])=>{const el=document.getElementById(id);if(el)el.onchange=()=>{A[k]=el.checked;save();applyA11y();};});
   main.querySelectorAll(".tint").forEach(b=>b.onclick=()=>{A.tint=b.dataset.tint;save();applyA11y();main.querySelectorAll(".tint").forEach(x=>{x.classList.toggle("on",x===b);x.setAttribute("aria-pressed",x===b);});});
 }
 
