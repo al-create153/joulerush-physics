@@ -735,6 +735,8 @@ details.seeans{margin-top:6px}
 .findq{border:2px solid var(--accent);border-radius:16px;padding:12px 16px;margin:4px 0 12px;background:var(--surface)}
 .findq .fq-l{display:block;font-size:13px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:var(--accent);margin-bottom:4px}
 .findq p{margin:0;font-size:21px;line-height:1.35;font-weight:700}
+.againlab{margin:14px 0 6px}
+.sheet-btns .btn.primary{grid-column:1/-1}
 details.unitstab>summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:44px}
 details.unitstab>summary::-webkit-details-marker{display:none}
 details.unitstab>summary h3{margin:0;flex:1}
@@ -7049,10 +7051,9 @@ function noteSummary(id,o){
   const n=NOTE[id],st=nst(id);const sm=!!o.study;const all=watchedAll(id)&&(st.lab||!n.lab);
   screen(`${noteTop(n,n.ch.length+1)}<p class="tag">${sm?"Study again":"Key note"} · ${LN(Math.floor(n.lvl))}</p>
    <div class="notecard keynote"><span class="notelab">Key note</span><h2 class="ntitle">${n.title}</h2><ul class="kpoints" id="factText">${n.ch.map(c=>`<li>${c.pt}</li>`).join("")}</ul></div>
-   ${sm?`<p class="checklab">Go over any of these, then practise</p>`:""}
-   <div class="again"><button class="btn" id="aW">▶ Watch${watchedAll(id)?" again":""}</button>${n.lab?`<button class="btn" id="aL">🧪 Try it${st.lab?" again":""}</button>`:""}<button class="btn" id="aR">📖 Read more${st.read?" ✓":""}</button></div>
-   ${!sm&&!st.read?`<p class="soft small">Read more is optional. It goes a bit deeper.</p>`:""}
-   <button class="btn primary wide" id="cont" ${all||sm?"":"disabled"}>${sm?"Practise this now":st.done?"Carry on":"Add to my notes and carry on"}</button>`);
+   <button class="btn primary wide" id="cont" ${all||sm?"":"disabled"}>${sm?"Practise this now":st.done?"Carry on":"Add to my notes and carry on"} ›</button>
+   <p class="soft small againlab">Want to go over it? (You don't have to.)</p>
+   <div class="again"><button class="btn" id="aW">▶ Watch${watchedAll(id)?" again":""}</button>${n.lab?`<button class="btn" id="aL">🧪 Try it${st.lab?" again":""}</button>`:""}<button class="btn" id="aR">📖 Read more${st.read?" ✓":""}</button></div>`);
   document.getElementById("aW").onclick=()=>watch(id,o,0,0);
   const aL=document.getElementById("aL");if(aL)aL.onclick=()=>labStage(id,o);
   document.getElementById("aR").onclick=()=>readView(id,o);
@@ -7382,7 +7383,7 @@ function sheet(kind,title,body,btn,fn,auto){
   if(auto)setTimeout(me,auto);
 }
 function sheetChoice(kind,title,body,btns,hint){
-  stopSpeech();sheetEl.className="sheet show "+kind;document.body.classList.add("sheet-open");
+  btns=[...btns].sort((a,b)=>(b.primary?1:0)-(a.primary?1:0));stopSpeech();sheetEl.className="sheet show "+kind;document.body.classList.add("sheet-open");
   sheetEl.innerHTML=fracify(`<div class="sheet-in"><div class="sheet-txt"><p class="verdict">${title}</p>${body||""}</div>${hint?`<p class="sheet-hint">${hint}</p>`:""}<div class="sheet-btns">${btns.map((b,i)=>`<button class="btn wide ${b.primary?"primary":""}" data-sb="${i}">${b.label}</button>`).join("")}</div></div>`);
   const runs=btns.map(b=>{const me=()=>{if(sheetFn!==runs[btns.findIndex(x=>x.primary)])return;hideSheet();b.fn();};return me;});
   sheetFn=runs[btns.findIndex(x=>x.primary)];
