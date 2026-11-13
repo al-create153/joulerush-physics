@@ -736,6 +736,9 @@ details.seeans{margin-top:6px}
 .findq .fq-l{display:block;font-size:13px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:var(--accent);margin-bottom:4px}
 .findq p{margin:0;font-size:21px;line-height:1.35;font-weight:700}
 .againlab{margin:14px 0 6px}
+table.dtab{border-collapse:collapse;margin:8px auto;font-size:16px;font-variant-numeric:tabular-nums}
+table.dtab th,table.dtab td{border:1.5px solid var(--line,#ccd);padding:6px 10px;text-align:center}
+table.dtab th{background:var(--surface);font-weight:700}
 .sheet-btns .btn.primary{grid-column:1/-1}
 details.unitstab>summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:44px}
 details.unitstab>summary::-webkit-details-marker{display:none}
@@ -809,7 +812,7 @@ table.tdash{min-width:560px}table.tdash td{white-space:nowrap}
 const R=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
 const pick=a=>a[Math.floor(Math.random()*a.length)];
 function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
-function fmt(x,sf=3){if(!isFinite(x))return "?";if(Math.abs(x)<1e-9)return "0";const r=Math.round(x);const o=Math.abs(x-r)<1e-9?String(r):String(Number(x.toPrecision(sf)));return o.replace("-","−");}
+function fmt(x,sf=3){if(!isFinite(x))return "?";if(Math.abs(x)<1e-9)return "0";const r=Math.round(x);let o=Math.abs(x-r)<1e-9?String(r):String(Number(x.toPrecision(sf)));if(/^-?\d{6,}$/.test(o))o=o.replace(/\B(?=(\d{3})+(?!\d))/g,"\u202F");return o.replace("-","−");}
 const VB='<span class="vb">v</span>';
 const MS='m&nbsp;s<sup>−1</sup>', MS2='m&nbsp;s<sup>−2</sup>';
 const U=(x,unit)=>`${fmt(x)}${unit?'&nbsp;'+unit:''}`;
@@ -5855,6 +5858,241 @@ const TFN={
 };
 /* nudges for other kinds of question */
 const KN={gap:"Read it again with your words in. Does it make sense?",order:"What has to happen first?",kw:"Say the word out loud. What does it remind you of?",calc:"Check each line: K, then F, then C."};
+
+/* ============ test-level practice: the skills the N3 and N4 unit tests ask for, and a little beyond ============ */
+UNITS.pc=["%","%"];UNITS.mm=["mm","mm"];
+/* small figures */
+function oscFig(n,amp=1){const W=300,H=120,mid=60,A=34*amp,L=W/n;let d=`M0 ${mid}`;for(let x=0;x<=W;x+=2)d+=` L${x} ${(mid-A*Math.sin(2*Math.PI*x/L)).toFixed(1)}`;
+  let g="";for(let i=1;i<6;i++)g+=`<line x1="${i*50}" y1="0" x2="${i*50}" y2="${H}" stroke="#2f6f4f" stroke-width="0.6"/>`;for(let j=1;j<4;j++)g+=`<line x1="0" y1="${j*30}" x2="${W}" y2="${j*30}" stroke="#2f6f4f" stroke-width="0.6"/>`;
+  return `<svg viewBox="0 0 ${W} ${H}" class="lab-svg" role="img" aria-label="Oscilloscope screen"><rect width="${W}" height="${H}" rx="8" fill="#0e2a1d"/>${g}<path d="${d}" fill="none" stroke="#5cf29b" stroke-width="3"/></svg>`;}
+function tbl(head,rows){return `<table class="dtab"><tr>${head.map(h=>`<th>${h}</th>`).join("")}</tr>${rows.map(r=>`<tr>${r.map(c=>`<td>${c}</td>`).join("")}</tr>`).join("")}</table>`;}
+function barFig(data,unit,max){const W=320,H=180,bw=Math.min(54,(W-50)/data.length-12);let g="";
+  for(let v=0;v<=max;v+=max/4){const y=H-26-(v/max)*(H-46);g+=`<line x1="44" y1="${y}" x2="${W}" y2="${y}" stroke="currentColor" stroke-opacity=".15"/><text x="40" y="${y+4}" text-anchor="end" font-size="10" fill="currentColor">${fmt(v)}</text>`;}
+  data.forEach(([lab,v],i)=>{const x=56+i*((W-60)/data.length),h=(v/max)*(H-46);g+=`<rect x="${x}" y="${H-26-h}" width="${bw}" height="${h}" rx="3" fill="var(--accent)"/><text x="${x+bw/2}" y="${H-10}" text-anchor="middle" font-size="11" fill="currentColor">${lab}</text>`;});
+  return `<svg viewBox="0 0 ${W} ${H}" class="lab-svg" role="img" aria-label="Bar chart">${g}<text x="6" y="12" font-size="10" fill="currentColor">${unit}</text></svg>`;}
+function lensFig(kind){const conv=kind==="convex";const lens=conv?`<path d="M150 20 Q172 80 150 140 Q128 80 150 20Z" fill="#9fd3ff" stroke="#3a7bd5" stroke-width="2"/>`:`<path d="M138 20 L162 20 Q148 80 162 140 L138 140 Q152 80 138 20Z" fill="#9fd3ff" stroke="#3a7bd5" stroke-width="2"/>`;
+  return `<svg viewBox="0 0 300 160" class="lab-svg" role="img" aria-label="${kind} lens">${lens}${[45,80,115].map(y=>`<line x1="10" y1="${y}" x2="140" y2="${y}" stroke="#e8a33d" stroke-width="3"/>`).join("")}</svg>`;}
+
+/* ---------- new key notes ---------- */
+note({id:"syE3",topic:"space",lvl:3.3,title:"Planet Earth",big:["space"],
+ read:{s:["The Earth has layers. The crust is on the outside. The inner core in the middle is the hottest part.","The crust is cut into big pieces called plates. They move very slowly.","Weathering breaks rocks into smaller bits. It happens very slowly, over many years."],
+  link:"Water gets into a crack. It freezes and gets bigger. The crack gets wider. This is freeze-thaw.",
+  c:[C("The hottest layer of the Earth is the…","inner core",["crust","mantle"]),C("Moving plates can cause…","earthquakes",["rainbows","tides"]),C("Weathering happens…","very slowly",["in one day","only in summer"])]},
+ ch:[KK("The Earth has layers. The inner core is the hottest.",
+  [["From the outside in: crust, mantle, outer core, inner core.",()=>scChain([["🟫","crust"],["🟧","mantle"],["🟠","outer core"],["🔴","inner core"]])]],
+  [C("The outside layer of the Earth is the…","crust",["inner core","mantle"]),C("Which layer is the hottest?","inner core",["crust","mantle"])]),
+ KK("The crust is made of plates. When they move, we get earthquakes and volcanoes.",
+  [["Plates move a few centimetres a year.",()=>scEmo([["🌋","volcano"],["🏚️","earthquake"]],"plates moving")]],
+  [C("Tectonic plates are parts of the…","crust",["inner core","atmosphere"]),C("Moving plates can cause…","volcanoes",["rain","day and night"])]),
+ KK("Weathering breaks rocks down: physical, biological or chemical.",
+  [["Physical: ice, wind, water. Biological: roots and animals. Chemical: acid rain.",()=>scEmo([["🧊","physical"],["🌳","biological"],["🌧️","chemical"]])]],
+  [C("A tree root splits a rock. This is…","biological weathering",["chemical weathering","physical weathering"]),C("Water freezes in a crack and makes it wider. This is…","physical weathering",["biological weathering","chemical weathering"])])]});
+
+note({id:"poE4",topic:"power",lvl:4.4,title:"Efficiency",big:["energy"],
+ read:{s:["The power rating tells you how much energy something uses each second.","Efficiency tells you how much of the energy is useful.","Efficiency = useful energy out ÷ total energy in × 100. The answer is a percentage."],
+  link:"A lamp is given 100 J. It gives out 20 J of light. It is 20% efficient. The rest is wasted as heat.",
+  c:[C("A 2000 W kettle uses…","2000 J each second",["2000 J each hour","2000 W each second"]),C("A more efficient machine wastes…","less energy",["more energy","the same energy"])]},
+ ch:[KK("Power rating means the energy used each second.",
+  [["A 1600 W kettle uses 1600 joules every second.",()=>scBig("1600 W","= 1600 J every second")]],
+  [C("A 60 W lamp uses…","60 J every second",["60 J every minute","60 W every hour"]),C("Power is measured in…","watts (W)",["joules (J)","volts (V)"])]),
+ KK("Efficiency = useful energy ÷ total energy × 100%.",
+  [["Useful energy is the part we want. The rest is wasted, often as heat.",()=>scBig("useful ÷ total × 100","= efficiency %")]],
+  [C("400 J in, 100 J useful. The efficiency is…","25%",["4%","75%"]),C("Efficiency is a…","percentage",["force","speed"])]),
+ KK("A better efficiency rating means lower running costs.",
+  [["An A rated machine wastes less energy, so it costs less to run.",()=>scEmo([["🅰️","wastes less"],["💷","costs less"]])]],
+  [C("Machine 1 is rated A. Machine 2 is rated D. Which wastes less energy?","Machine 1",["Machine 2","They are the same"]),C("Using less energy means…","lower bills",["higher bills","no change"])])]});
+
+note({id:"ciD4",topic:"circuits",lvl:4.6,title:"Digital and analogue",big:["electricity"],
+ read:{s:["Digital means only two settings: on or off.","Analogue means it can change smoothly, like a dimmer.","A switch is a digital input. An LDR, a thermistor and a microphone are analogue inputs. A lamp, a loudspeaker and a motor are analogue outputs."],
+  link:"A light switch is either on or off: digital. A volume knob can be anywhere: analogue.",
+  c:[C("A switch is…","a digital input",["an analogue input","an output"]),C("A loudspeaker is…","an analogue output",["a digital input","an analogue input"])]},
+ ch:[KK("Digital means on or off. Analogue can change smoothly.",
+  [["A switch is on or off. A dimmer can be anywhere in between.",()=>scEmo([["🔘","digital: on / off"],["🎚️","analogue: any value"]])]],
+  [C("Digital means…","only on or off",["any value","always on"]),C("A dimmer switch that changes brightness smoothly is…","analogue",["digital","an output"])]),
+ KK("Inputs sense. Outputs do something.",
+  [["Inputs: switch (digital), LDR, thermistor, microphone (analogue). Outputs: lamp, loudspeaker, motor (analogue). LED, buzzer, relay (digital).",()=>scEmo([["🎤","input"],["🔊","output"]])]],
+  [C("A microphone is an…","analogue input",["analogue output","digital input"]),C("A lamp is an…","analogue output",["digital input","analogue input"])])]});
+
+note({id:"raD4",topic:"radiation",lvl:4.6,title:"Detecting and using radiation",big:["waves"],
+ read:{s:["We need detectors for radiation we cannot see.","A Geiger-Müller (GM) tube detects gamma. An aerial detects radio. Fluorescent dye glows in UV. A thermometer or thermal camera detects infrared. Photographic film detects X-rays.","Too much UV can cause sunburn, skin cancer and damage to your eyes."],
+  link:"A factory checks paper thickness. Thicker paper lets less radiation through, so the detector reading goes down.",
+  c:[C("A GM tube detects…","gamma rays",["radio waves","sound"]),C("UV can cause…","skin cancer",["broken bones","hearing loss"])]},
+ ch:[KK("Each type of radiation has its own detector.",
+  [["Gamma: GM tube. Radio: aerial. UV: fluorescent dye. Infrared: thermometer. X-rays: photographic film.",()=>scEmo([["📟","GM tube"],["📡","aerial"],["✨","dye"]])]],
+  [C("An aerial detects…","radio waves",["gamma rays","UV"]),C("Fluorescent dye glows in…","ultraviolet",["radio waves","sound"])]),
+ KK("Too much UV is harmful: sunburn, skin cancer and eye damage.",
+  [["Wear sun cream, a hat and sunglasses.",()=>scEmo([["☀️","UV"],["🧴","sun cream"],["🕶️","sunglasses"]])]],
+  [C("Which is a harm from UV?","sunburn",["broken bones","deafness"]),C("Sunglasses protect your…","eyes from UV",["ears from noise","skin from cold"])]),
+ KK("Nuclear radiation can check thickness. Nuclear power makes no carbon dioxide, but its waste is dangerous.",
+  [["Thicker paper blocks more, so less reaches the detector.",()=>scEmo([["📄","thicker paper"],["📉","lower reading"]])]],
+  [C("The paper gets thicker. The detector reading…","goes down",["goes up","stays the same"]),C("One hazard of nuclear power is…","radioactive waste",["it makes smoke","it needs wind"])])]});
+
+/* ---------- Electricity and Energy ---------- */
+calcFam({id:"po.eff4",topic:"power",lvl:4.6,big:["energy","proportion"],note:"poE4",tags:["formula-wrong"]},()=>{
+  const tot=pick([200,400,500,800,1000,2000,160000,200000]),pc=pick([10,20,25,40,50,60,75,80,90]);const use=tot*pc/100;const dev=pick(["kettle","lamp","motor","heater","TV"]);
+  return calcItem(`A ${dev} is given ${fmt(tot)} J of energy. It gives out ${fmt(use)} J of useful energy. Calculate its percentage efficiency.`,{sym:"efficiency",ans:pc,unit:"%",uk:"pc",
+    K:[`useful energy = ${fmt(use)} J`,`total energy = ${fmt(tot)} J`,"efficiency = ?"],F:"efficiency = useful ÷ total × 100",
+    Fw:[["efficiency = total ÷ useful × 100","formula-wrong"],["efficiency = useful × total","formula-wrong"]],sub:`efficiency = ${fmt(use)} ÷ ${fmt(tot)} × 100`,
+    subW:[[`efficiency = ${fmt(tot)} ÷ ${fmt(use)} × 100`,"formula-wrong"],[`efficiency = ${fmt(use)} ÷ ${fmt(tot)}`,"general"]],wv:[[tot/use*100,"formula-wrong"],[use/tot,"general"],[100-pc,"general"]],units:["pc","J","W","s"]});});
+calcFam({id:"po.eff4b",topic:"power",lvl:4.9,big:["energy","proportion"],note:"poE4",tags:["formula-wrong","power-energy"]},()=>{
+  const P=pick([800,1000,1600,2000]),t=pick([50,100,125,200,250]);const E=P*t;const pc=pick([40,50,60,75,80]);const use=E*pc/100;
+  return calcItem(`A ${P} W kettle is on for ${t} s. The water gains ${fmt(use)} J of heat. First find the energy supplied. Then calculate the percentage efficiency.`,{sym:"efficiency",ans:pc,unit:"%",uk:"pc",
+    K:[`P = ${P} W`,`t = ${t} s`,`E = ${P} × ${t} = ${fmt(E)} J`,`useful = ${fmt(use)} J`],F:"efficiency = useful ÷ total × 100",
+    Fw:[["efficiency = total ÷ useful × 100","formula-wrong"],["efficiency = P ÷ t","power-energy"]],sub:`efficiency = ${fmt(use)} ÷ ${fmt(E)} × 100`,
+    subW:[[`efficiency = ${fmt(use)} ÷ ${P} × 100`,"power-energy"]],wv:[[use/P*100,"power-energy"],[E/use*100,"formula-wrong"],[100-pc,"general"]],units:["pc","J","W","s"]});});
+bank({id:"po.rate4",topic:"power",lvl:4.5,type:"idea",big:["energy"],note:"poE4"},[
+ Q("What does the power rating of a kettle tell you?","the energy it uses each second",[["how hot it gets","general"],["how long it lasts","general"]],"Power = energy each second."),
+ Q("A hair dryer is rated 1200 W. Each second it uses…","1200 J",[["1200 W","general","Energy is in joules."],["12 J","general"]],"1 W = 1 J every second."),
+ Q("Washing machine A is rated A. Washing machine B is rated E. Which is more energy efficient?","A",[["B","general","A is the best rating."],["They are the same","general"]],"A wastes the least energy."),
+ Q("Why should a machine with a better efficiency rating cost less to run?","It wastes less energy",[["It is smaller","general"],["It uses more power","general"]],"Less energy used means a lower bill."),
+ Q("Most wasted energy in a machine is given out as…","heat",[["light","general"],["kinetic energy","general"]],"Heat that we do not want."),
+ Q("A lamp is 100% efficient. This would mean…","no energy is wasted",[["it is very bright","general"],["it uses 100 W","general"]],"No real lamp is 100% efficient.")]);
+bank({id:"po.gen4",topic:"power",lvl:4.6,type:"idea",big:["energy","electricity"],note:"po4c"},[
+ Q("A coil is joined to a voltmeter. How can you make a voltage?","move a magnet in or out of the coil",[["hold the magnet still in the coil","general","Nothing happens if it is still."],["heat the coil","general"]],"Movement is needed."),
+ Q("Which would give a bigger voltage from a magnet and coil?","more turns on the coil",[["fewer turns on the coil","general"],["a weaker magnet","general"]],"Also: a stronger magnet, or move it faster."),
+ Q("Which would give a bigger voltage from a magnet and coil?","move the magnet faster",[["move the magnet slower","general"],["use a plastic coil","general"]],"Faster movement gives more voltage."),
+ Q("Which three things make a simple electromagnet?","a coil of wire, a battery and a switch",[["a lamp, an LED and a motor","general"],["a resistor, a motor and an LED","general"]],"Current through a coil makes a magnet. An iron core makes it stronger."),
+ Q("Why use an electromagnet, not a normal magnet, in a scrapyard?","It can be switched off to drop the metal",[["It is lighter","general"],["It works on plastic","general"]],"Switch off: the metal drops."),
+ Q("In a power station, the turbine turns a…","generator",[["battery","general"],["transformer","general"]],"The generator makes the electricity.")]);
+bank({id:"po.ren4",topic:"power",lvl:4.4,type:"idea",big:["energy"],note:"po3a"},[
+ Q("One advantage of wind power is that it…","does not make carbon dioxide",[["works when there is no wind","general"],["is cheap to build","general"]],"It also will not run out."),
+ Q("One disadvantage of solar panels is that they…","do not work at night",[["make smoke","general"],["will run out","renewable-mixup"]],"No light, no electricity."),
+ Q("A house has solar panels. Why is it still joined to the National Grid?","to get electricity at night",[["so the panels get hotter","general"],["to make the wind blow","general"]],"Also: the panels may not make enough on dull days."),
+ Q("A wind turbine makes different amounts of energy each month because…","the wind speed changes",[["the turbine gets tired","general"],["the Sun moves","general"]],"Some months are windier. Months have different numbers of days too."),
+ Q("Why might a town choose a nuclear power station rather than a gas one?","it gives out no carbon dioxide",[["its waste is safe","general"],["it is renewable","renewable-mixup"]],"Gas releases carbon dioxide."),
+ Q("A disadvantage of hydroelectric power is…","it costs a lot to build",[["it will run out","renewable-mixup"],["it makes smoke","general"]],"Dams are expensive and flood land."),
+ Q("Solar panels can lower a home's electricity bill because…","sunlight is free",[["they make heat","general"],["they use less sunlight","general"]],"You buy less electricity from the grid.")]);
+bank({id:"po.data4",topic:"power",lvl:4.3,type:"idea",big:["energy","evidence"],note:"po3a"},[
+ ()=>{const a=pick([600,700,820,900]),b=pick([500,640,740,800]),c=pick([860,960,1000,1100]);const s=a+b+c;const av=s/3;if(Math.abs(av-Math.round(av))>1e-9)return Q("A wind turbine makes 820 MJ in January, 740 MJ in February and 960 MJ in March. What is the average monthly energy?","840 MJ",[["2520 MJ","general","That is the total. Now divide by 3."],["960 MJ","general"]],"Add them up, then divide by 3.",{fig:tbl(["Month","Energy (MJ)"],[["Jan","820"],["Feb","740"],["Mar","960"]])});
+   return Q(`Use the table. What is the average monthly energy?`,`${fmt(av)} MJ`,[[`${fmt(s)} MJ`,"general","That is the total. Now divide by 3."],[`${fmt(Math.max(a,b,c))} MJ`,"general"]],"Add them up, then divide by 3.",{fig:tbl(["Month","Energy (MJ)"],[["Jan",a],["Feb",b],["Mar",c]])});}]);
+bank({id:"ci.dig4",topic:"circuits",lvl:4.7,type:"idea",big:["electricity"],note:"ciD4"},[
+ Q("Which is a digital input device?","switch",[["LDR","general","An LDR changes smoothly: analogue."],["microphone","general","A microphone is analogue."]],"A switch is only on or off."),
+ Q("Which is an analogue output device?","loudspeaker",[["switch","general","A switch is an input."],["microphone","general","A microphone is an input."]],"A loudspeaker can be loud or soft."),
+ Q("Which is an analogue input device?","thermistor",[["switch","general","A switch is digital."],["lamp","general","A lamp is an output."]],"It senses temperature, which changes smoothly."),
+ Q("Which is an output device?","motor",[["LDR","general","An LDR senses light: input."],["thermistor","general"]],"Outputs do something."),
+ Q("A digital signal can only be…","on or off",[["any value","general"],["very loud","general"]],"Two settings only."),
+ Q("A microphone is…","an analogue input",[["a digital input","general"],["an analogue output","general","It senses sound, so it is an input."]],"It senses sound, which changes smoothly.")]);
+bank({id:"ci.var4",topic:"circuits",lvl:4.5,type:"idea",big:["electricity"],note:"ci4b"},[
+ Q("A lamp and a variable resistor are in series. The resistance is decreased. The lamp…","gets brighter, because the current increases",[["gets dimmer, because the current decreases","general","Less resistance lets more current flow."],["stays the same","general"]],"Less resistance, more current, brighter lamp."),
+ Q("A lamp and a variable resistor are in series. The resistance is increased. The lamp…","gets dimmer, because the current decreases",[["gets brighter, because the current increases","general","More resistance lets less current flow."],["goes out and on again","general"]],"More resistance, less current, dimmer lamp."),
+ Q("To measure the current through a resistor, use…","an ammeter in series",[["a voltmeter in series","general"],["an ammeter in parallel","general","An ammeter goes in series."]],"Ammeters go in the loop."),
+ Q("To measure the voltage across a resistor, use…","a voltmeter in parallel",[["an ammeter in parallel","general"],["a voltmeter in series","general","A voltmeter goes across the part."]],"Voltmeters go across."),
+ Q("A meter in a circuit shows the letter V in a circle. It is…","a voltmeter",[["an ammeter","general"],["a variable resistor","general"]],"V for voltage.")]);
+bank({id:"pa.gas4",topic:"particles",lvl:4.1,type:"idea",big:["particles"],note:"pa4a"},[
+ Q("Describe the air particles inside a sealed balloon.","They move about in all directions",[["They stay still","general"],["They are packed tight in rows","general","That is a solid."]],"Gas particles are always moving."),
+ Q("A balloon is put on a warm radiator. The volume of the balloon…","increases",[["decreases","general","Heating makes the particles faster."],["stays the same","general"]],"Faster particles push the walls out."),
+ Q("A balloon is put in a freezer. The volume of the balloon…","decreases",[["increases","general"],["stays the same","general"]],"Slower particles, smaller balloon."),
+ Q("A gas is heated in a sealed box. Its particles…","move faster",[["get bigger","general","The particles stay the same size."],["stop","general"]],"Hotter means faster particles."),
+ Q("Gas particles hit the walls of a balloon. This causes…","pressure",[["weight","general"],["friction","general"]],"Pressure comes from the hits on the walls.")]);
+bank({id:"he.graph4",topic:"heat",lvl:4.6,type:"idea",big:["energy","evidence"],note:"he3c"},[
+ ()=>{const a=[90,80,72,66,62],b=[90,74,62,54,49];return Q("Two cups of hot water cool down. One is wrapped in material 1, one in material 2. Which material is the better insulator?","material 1",[["material 2","general","Material 2 lost heat faster."],["they are the same","general"]],"The better insulator keeps it hotter for longer.",{fig:tbl(["Time (min)","0","5","10","15","20"],[["Material 1",...a],["Material 2",...b]])});},
+ ()=>{const s=pick([[90,80,72,66],[85,76,69,64],[80,70,63,58]]);const nx=s[3]-(s[2]-s[3])+1;return Q(`The water cools. The pattern carries on. Predict the temperature at 20 minutes.`,`about ${nx} °C`,[[`about ${s[3]+6} °C`,"general","It is still cooling, so it gets lower."],["about 0 °C","general","It cools more slowly each time."]],"It drops by a bit less each time.",{fig:tbl(["Time (min)","0","5","10","15","20"],[["Temp (°C)",...s,"?"]])});},
+ Q("Two containers of boiling water are wrapped in different materials. To make it a fair test, keep the same…","volume of water",[["material","general","That is what you are testing."],["final temperature","general"]],"Also the same thickness of material and starting temperature."),
+ Q("Heat moves along a metal spoon in hot tea. This is…","conduction",[["convection","general"],["radiation","general"]],"Through a solid: conduction."),
+ Q("The Sun warms the Earth. This is…","radiation",[["conduction","general"],["convection","general","There are no particles in space."]],"Radiation can cross empty space."),
+ Q("A heater warms the air in a room. The warm air rises. This is…","convection",[["conduction","general"],["radiation","general"]],"Warm air rises, cool air sinks.")]);
+
+/* ---------- Waves and Radiation ---------- */
+calcFam({id:"wa.fsml4",topic:"waves",lvl:4.5,big:["waves","proportion"],note:"wa4a",tags:["formula-wrong"]},()=>{
+  const N=pick([2,4,5,6,10]),t=pick([20,40,50,60,100]);const f=N/t;if(fmt(f).length>5)return calcItem(`A wave machine makes 5 waves in 50 s. Calculate the frequency.`,{sym:"f",ans:0.1,unit:"Hz",uk:"Hz",K:["N = 5","t = 50 s","f = ?"],F:"f = N / t",Fw:[["f = N × t","formula-wrong"],["f = t / N","formula-wrong"]],sub:"f = 5 / 50",subW:[["f = 50 / 5","formula-wrong"]],wv:[[250,"formula-wrong"],[10,"formula-wrong"]],units:U_WV});
+  return calcItem(`A wave machine makes ${N} waves in ${t} s. Calculate the frequency.`,{sym:"f",ans:f,unit:"Hz",uk:"Hz",K:[`N = ${N}`,`t = ${t} s`,"f = ?"],
+    F:"f = N / t",Fw:[["f = N × t","formula-wrong"],["f = t / N","formula-wrong"]],sub:`f = ${N} / ${t}`,subW:[[`f = ${t} / ${N}`,"formula-wrong"]],wv:[[N*t,"formula-wrong"],[t/N,"formula-wrong"]],units:U_WV});});
+calcFam({id:"wa.vfl4b",topic:"waves",lvl:4.8,big:["waves","proportion"],note:"wa4b",tags:["formula-wrong"]},()=>{
+  const N=pick([5,4,2,10]),t=pick([50,20,40]),l=pick([2,3,4,5]);const f=N/t,v=f*l;
+  return calcItem(`A wave machine makes ${N} waves in ${t} s. The wavelength is ${l} m. First find the frequency. Then calculate the speed of the waves.`,{sym:"v",ans:v,unit:MS,uk:"ms",
+    K:[`f = ${N} / ${t} = ${fmt(f)} Hz`,`λ = ${l} m`,"v = ?"],F:"v = f λ",Fw:[["v = f / λ","formula-wrong"],["v = N × t","formula-wrong"]],sub:`v = ${fmt(f)} × ${l}`,
+    subW:[[`v = ${N} × ${l}`,"general"],[`v = ${fmt(f)} / ${l}`,"formula-wrong"]],wv:[[N*l,"general"],[f/l,"formula-wrong"],[t/N*l,"formula-wrong"]],units:U_WV});});
+bank({id:"wa.osc3",topic:"waves",lvl:3.7,type:"idea",big:["waves"],note:"wa3b"},[
+ ()=>{const n=pick([2,3,4,5]);return Q("How many complete waves are on the oscilloscope screen?",String(n),[[String(n+1),"general"],[String(n*2),"general","Count crest to crest, not every crest and trough."]],"Count from one crest to the next.",{fig:oscFig(n)});},
+ Q("The frequency goes up. The oscilloscope settings stay the same. The number of waves on the screen…","goes up",[["goes down","general"],["stays the same","general"]],"Higher frequency: more waves in the same time."),
+ Q("The sound gets louder. On the oscilloscope, the waves get…","taller",[["closer together","general","That would be a higher pitch."],["fewer","general"]],"Louder means a bigger amplitude."),
+ Q("Water waves in a pool go up and down as they move along. They are…","transverse",[["longitudinal","general","Longitudinal waves push back and forth, like sound."],["not waves","general"]],"Up and down at right angles to the movement."),
+ Q("Sound waves are…","longitudinal",[["transverse","general","Sound vibrates back and forth along the direction it moves."],["electromagnetic","general"]],"The air moves back and forth.")]);
+bank({id:"so.safe4",topic:"sound",lvl:4.2,type:"idea",big:["waves"],note:"so3b"},[
+ Q("Airport workers are near very loud aircraft. What is the risk?","damage to their hearing",[["sunburn","general"],["broken bones","general"]],"Loud sounds can damage your ears."),
+ Q("How can airport workers protect their hearing?","wear ear defenders",[["wear sunglasses","general"],["wear a hard hat","general"]],"Ear defenders absorb sound."),
+ Q("Sound level is measured with a sound level meter in…","decibels (dB)",[["hertz (Hz)","general","Hz is for frequency."],["watts (W)","general"]],"dB for loudness."),
+ Q("Sound with a frequency too high for humans to hear is…","ultrasound",[["infrared","general"],["an echo","general"]],"Above about 20 000 Hz."),
+ Q("Sound travels fastest through…","solids",[["gases","general","Gas particles are far apart."],["a vacuum","general","Sound cannot travel in a vacuum."]],"Particles are closest in solids.")]);
+bank({id:"so.data3",topic:"sound",lvl:3.8,type:"idea",big:["waves","evidence"],note:"so3a"},[
+ ()=>{const d=[["air",340],["water",1500],["glass",4500],["steel",6000]];const k=pick([1,2,3]);return Q(`Use the bar chart. What is the speed of sound in ${d[k][0]}?`,`${d[k][1]} ${MS}`,[[`${d[k-1][1]} ${MS}`,"general"],[`${d[k][1]*2} ${MS}`,"general","Check the scale on the side."]],"Read across from the top of the bar.",{fig:barFig(d,"speed (m/s)",8000)});},
+ ()=>{const d=[["air",340],["water",1500],["glass",4500],["steel",6000]];const k=pick([1,2,3]);return Q(`A pupil measures the speed of sound in a material as ${d[k][1]} ${MS}. Use the bar chart. Which material is it?`,d[k][0],[[d[k===3?2:3][0],"general"],["air","general"]],"Find the bar with that height.",{fig:barFig(d,"speed (m/s)",8000)});}]);
+calcFam({id:"li.mag3",topic:"light",lvl:3.8,big:["light","proportion"],note:"li3c",tags:["formula-wrong"]},()=>{
+  const m=pick([2,3,4,5,10]),s=pick([5,8,10,12,15,20,25]);
+  return calcItem(`A magnifier has a magnification of ${m}. A stamp is ${s} mm wide. Calculate how wide it looks through the magnifier.`,{sym:"width",ans:m*s,unit:"mm",uk:"mm",
+    K:[`magnification = ${m}`,`real width = ${s} mm`,"width it looks = ?"],F:"width it looks = magnification × real width",Fw:[["width it looks = real width ÷ magnification","formula-wrong"],["width it looks = real width + magnification","formula-wrong"]],
+    sub:`width = ${m} × ${s}`,subW:[[`width = ${s} ÷ ${m}`,"formula-wrong"]],wv:[[s/m,"formula-wrong"],[s+m,"formula-wrong"]],units:["mm","m","s","Hz"]});});
+bank({id:"li.lens4",topic:"light",lvl:4.0,type:"idea",big:["light"],note:"li3c"},[
+ Q("Parallel rays go through this lens. After the lens, they…","come together at a point",[["spread out","general","A concave lens spreads light out."],["stop","general"]],"A convex lens is fat in the middle: rays meet.",{fig:lensFig("convex")}),
+ Q("Parallel rays go through this lens. After the lens, they…","spread out",[["come together at a point","general","A convex lens brings rays together."],["go straight back","general"]],"A concave lens is thin in the middle: rays spread.",{fig:lensFig("concave")}),
+ Q("A ray goes straight through the centre of a lens. It…","does not bend",[["bends up","general"],["bends down","general"]],"The middle ray goes straight on."),
+ Q("The line drawn at 90° to a mirror is called the…","normal",[["ray","general"],["angle","general"]],"Angles are measured from the normal."),
+ Q("The law of reflection says the angle of incidence is…","equal to the angle of reflection",[["bigger than the angle of reflection","general"],["always 90°","general"]],"They are always the same."),
+ Q("White light goes through a prism. Which colour bends the most?","violet",[["red","general","Red bends the least."],["green","general"]],"Violet is at the bottom of the spectrum."),
+ Q("White light goes through a prism. Which colour bends the least?","red",[["violet","general","Violet bends the most."],["blue","general"]],"Red is at the top of the spectrum.")]);
+bank({id:"ra.det4",topic:"radiation",lvl:4.6,type:"idea",big:["waves"],note:"raD4"},[
+ Q("Which detector is used for gamma rays?","Geiger-Müller tube",[["aerial","general","An aerial is for radio."],["fluorescent dye","general","Dye is for UV."]],"GM tube for gamma."),
+ Q("Which detector is used for radio waves?","aerial",[["Geiger-Müller tube","general"],["thermometer","general"]],"An aerial picks up radio."),
+ Q("Which detector is used for ultraviolet?","fluorescent dye",[["aerial","general"],["Geiger-Müller tube","general"]],"The dye glows in UV."),
+ Q("Which detector is used for infrared?","thermometer",[["aerial","general"],["fluorescent dye","general"]],"Infrared is heat radiation."),
+ Q("Name two ways UV can harm people.","sunburn and skin cancer",[["broken bones and deafness","general"],["colds and coughs","general"]],"It can also damage your eyes."),
+ Q("Paper passes between a radioactive source and a detector. The paper gets thicker. The reading…","decreases",[["increases","general","Thicker paper blocks more."],["stays the same","general"]],"Less radiation gets through."),
+ Q("One hazard of a nuclear power station is…","radioactive waste",[["carbon dioxide","general","Nuclear power makes no carbon dioxide."],["noise","general"]],"Also: a radiation leak.")]);
+bank({id:"ra.use3",topic:"radiation",lvl:3.8,type:"idea",big:["waves"],note:"ra3b"},[
+ Q("Which radiation is used to find broken bones?","X-rays",[["infrared","general"],["ultraviolet","general"]],"X-rays pass through skin but not bone."),
+ Q("A thermogram shows where a house loses heat. It uses…","infrared",[["X-rays","general"],["ultraviolet","general"]],"Infrared is heat radiation."),
+ Q("Fake bank notes can be found because real ones glow under…","ultraviolet",[["infrared","general"],["radio waves","general"]],"UV makes special ink glow."),
+ Q("Which radiation cooks food quickly?","microwaves",[["X-rays","general"],["gamma rays","general"]],"Microwave ovens."),
+ Q("TV and radio signals use…","radio waves",[["gamma rays","general"],["X-rays","general"]],"Radio waves carry signals.")]);
+
+/* ---------- Dynamics and Space ---------- */
+calcFam({id:"fo.fma4",topic:"forces",lvl:4.7,big:["forces","proportion"],note:"fo4a",tags:["formula-wrong"]},()=>{
+  const want=pick(["F","m","a"]);const m=pick([0.5,1,2,4,5,10,50]),a=pick([0.5,1,2,3,4,5]);const F=m*a;const U=["N","kg","ms2","ms"];
+  if(want==="F")return calcItem(`A trolley of mass ${fmt(m)} kg accelerates at ${fmt(a)} ${MS2}. Calculate the unbalanced force.`,{sym:"F",ans:F,unit:"N",uk:"N",K:[`m = ${fmt(m)} kg`,`a = ${fmt(a)} ${MS2}`,"F = ?"],
+    F:"F = ma",Fw:[["F = m / a","formula-wrong"],["F = a / m","formula-wrong"]],sub:`F = ${fmt(m)} × ${fmt(a)}`,subW:[[`F = ${fmt(m)} / ${fmt(a)}`,"formula-wrong"]],wv:[[m/a,"formula-wrong"],[a/m,"formula-wrong"],[m+a,"general"]],units:U});
+  if(want==="m")return calcItem(`A force of ${fmt(F)} N gives a trolley an acceleration of ${fmt(a)} ${MS2}. Calculate the mass of the trolley.`,{sym:"m",ans:m,unit:"kg",uk:"kg",K:[`F = ${fmt(F)} N`,`a = ${fmt(a)} ${MS2}`,"m = ?"],
+    F:"m = F / a",Fw:[["m = F × a","formula-wrong"],["m = a / F","formula-wrong"]],sub:`m = ${fmt(F)} / ${fmt(a)}`,subW:[[`m = ${fmt(F)} × ${fmt(a)}`,"formula-wrong"]],wv:[[F*a,"formula-wrong"],[a/F,"formula-wrong"]],units:U});
+  return calcItem(`A force of ${fmt(F)} N acts on a ${fmt(m)} kg trolley. Calculate its acceleration.`,{sym:"a",ans:a,unit:MS2,uk:"ms2",K:[`F = ${fmt(F)} N`,`m = ${fmt(m)} kg`,"a = ?"],
+    F:"a = F / m",Fw:[["a = F × m","formula-wrong"],["a = m / F","formula-wrong"]],sub:`a = ${fmt(F)} / ${fmt(m)}`,subW:[[`a = ${fmt(F)} × ${fmt(m)}`,"formula-wrong"]],wv:[[F*m,"formula-wrong"],[m/F,"formula-wrong"]],units:U});});
+bank({id:"fo.data4",topic:"forces",lvl:4.6,type:"idea",big:["forces","evidence"],note:"fo4a"},[
+ ()=>{const k=pick([0.6,0.8,1.2]);const row=[2.5,5,7.5].map(F=>+(F*k*0.98).toFixed(1));const nx=+(10*k*0.98).toFixed(1);return Q("A pupil pulls a trolley with different forces. Suggest the acceleration for 10.0 N.",`about ${fmt(nx)} ${MS2}`,[[`about ${fmt(row[2])} ${MS2}`,"general","More force gives more acceleration."],[`about ${fmt(row[0])} ${MS2}`,"general"]],"Follow the pattern: it goes up by about the same each time.",{fig:tbl([`Force (N)`,`Acceleration (${MS2})`],[["2.5",row[0]],["5.0",row[1]],["7.5",row[2]],["10.0","?"]])});},
+ Q("A force of 0.5 N pulls a trolley, but it moves at a steady speed. Why does it not accelerate?","the forces on it are balanced",[["there is no gravity","general"],["it has no mass","general"]],"Friction is equal and opposite to the pull."),
+ Q("To find the average speed of a cyclist between two lamp posts, you time it and measure the…","distance between the lamp posts",[["mass of the bike","general"],["height of the lamp posts","general"]],"Speed = distance ÷ time."),
+ Q("A skier wants to go faster. One way to reduce friction is to…","wear tight clothing",[["wear a big coat","general"],["stand up tall","general","That makes more air resistance."]],"Also: crouch low and keep skis flat.")]);
+bank({id:"fo.fair3",topic:"forces",lvl:3.7,type:"idea",big:["evidence"],note:"fo3b"},[
+ ()=>{const r=pick([[53,56,56],[44,47,47],[22,23,15],[60,57,63]]);const av=(r[0]+r[1]+r[2])/3;return Q(`A ball is dropped three times. It bounces ${r[0]} mm, ${r[1]} mm and ${r[2]} mm. What is the average bounce height?`,`${fmt(av)} mm`,[[`${r[0]+r[1]+r[2]} mm`,"general","That is the total. Now divide by 3."],[`${Math.max(...r)} mm`,"general"]],"Add them, then divide by 3.");},
+ Q("Pupils test how high a ball bounces on different floors. To make it fair, keep the same…","ball and drop height",[["floor","general","The floor is what you are testing."],["bounce height","general"]],"Change only one thing."),
+ Q("Concrete is harder than wood. The ball bounced 55 mm on wood. Predict the bounce on concrete.","higher than 55 mm",[["lower than 55 mm","general","Harder surfaces gave higher bounces."],["0 mm","general"]],"Follow the pattern in the results."),
+ Q("Why repeat each drop three times?","to get a more reliable average",[["to make the ball bounce higher","general"],["to change the floor","general"]],"One odd result matters less."),
+ Q("A satellite is pulled towards the Earth by…","gravity (its weight)",[["air resistance","general"],["friction","general"]],"Gravity keeps it in orbit."),
+ Q("A satellite enters the atmosphere and slows down. Which force slows it?","air resistance (friction)",[["gravity","general"],["magnetism","general"]],"Air rubs against it."),
+ Q("As the satellite slows down in the atmosphere, its kinetic energy becomes…","heat",[["light only","general"],["mass","general"]],"Friction makes heat.")]);
+calcFam({id:"sy.dvt4",topic:"space",lvl:4.8,big:["space","proportion"],note:"sy4a",tags:["formula-wrong"]},()=>{
+  const t=pick([0.1,0.12,0.2,0.25,0.5,1.3]);const v=300000000;const d=v*t;
+  return calcItem(`A radio signal goes from America to Scotland by satellite. It takes ${fmt(t)} s. Radio signals travel at 300 000 000 ${MS}. Calculate the distance.`,{sym:"d",ans:d,unit:"m",uk:"m",
+    K:[`v = 300 000 000 ${MS}`,`t = ${fmt(t)} s`,"d = ?"],F:"d = v t",Fw:[["d = v / t","formula-wrong"],["d = t / v","formula-wrong"]],sub:`d = 300 000 000 × ${fmt(t)}`,subW:[[`d = 300 000 000 / ${fmt(t)}`,"formula-wrong"]],wv:[[v/t,"formula-wrong"],[d*10,"general"],[d/10,"general"]],units:["m","s","ms","kg"]});});
+bank({id:"sy.sat4",topic:"space",lvl:4.4,type:"idea",big:["space"],note:"sy4a"},[
+ Q("A geostationary satellite…","takes 24 hours to orbit, so it stays above the same place",[["takes 1 hour to orbit","general"],["orbits the Moon","general"]],"It is about 36 000 km up."),
+ Q("A curved dish on a satellite reflects signals. After they reflect, the signals…","come together at one point",[["spread out","general"],["stop","general"]],"The receiver sits at that point (the focus)."),
+ Q("Why is the receiver placed at the focus of a dish?","all the reflected signals meet there, so it is stronger",[["it is the coldest place","general"],["it is furthest away","general"]],"More signal in one place."),
+ Q("A weather satellite is in a lower orbit than a geostationary one. Its period is…","shorter",[["longer","general","Higher orbits take longer."],["the same","general"]],"Lower orbits take less time."),
+ Q("A moon is…","a natural satellite of a planet",[["a small star","general"],["a planet that orbits a star","general"]],"Moons orbit planets.")]);
+bank({id:"sy.table4",topic:"space",lvl:4.3,type:"idea",big:["space","evidence"],note:"sy3a"},[
+ ()=>{const rows=[["Titan",5150,16],["Rhea",1527,4.5],["Mimas",396,0.9],["Iapetus",1470,79],["Enceladus",504,1.4],["Dione",1123,2.7]];
+   const k=pick(["d","p"]);const fig=tbl(["Moon of Saturn","Diameter (km)","Orbit time (days)"],rows);
+   return k==="d"?Q("Use the table. Which moons have a diameter less than 600 km?","Mimas and Enceladus",[["Titan and Rhea","general","Those are the biggest."],["Mimas only","general","Check every row."]],"Look down the diameter column.",{fig})
+    :Q("Use the table. Which moon takes more than 20 days to orbit?","Iapetus",[["Titan","general","16 days is less than 20."],["Mimas","general"]],"Look down the orbit time column.",{fig});},
+ ()=>{const rows=[["Mercury",88],["Venus",225],["Earth",365],["Mars",687]];return Q("Use the table. What is the pattern?","planets further from the Sun take longer to orbit",[["planets further from the Sun orbit faster","general"],["all planets take the same time","general"]],"Read down the table.",{fig:tbl(["Planet (nearest first)","Orbit time (days)"],rows)});}]);
+bank({id:"sy.earth3",topic:"space",lvl:3.3,type:"idea",big:["space"],note:"syE3"},[
+ Q("In one day, the Earth…","rotates once on its axis",[["orbits the Sun once","general","That takes a year."],["orbits the Moon","general"]],"One spin = one day."),
+ Q("The Earth is a…","planet",[["star","general"],["moon","general"]],"It orbits the Sun."),
+ Q("The Sun is at the centre of our…","solar system",[["galaxy","general"],["planet","general"]],"The planets orbit the Sun."),
+ Q("Which layer of the Earth is the hottest?","inner core",[["crust","general","The crust is the cool outside."],["mantle","general"]],"The middle is hottest."),
+ Q("The movement of tectonic plates can cause…","earthquakes and volcanoes",[["day and night","general"],["the seasons","general"]],"Plates are parts of the crust."),
+ Q("Water gets into a crack in a rock, freezes and makes the crack wider. This is…","physical weathering",[["biological weathering","general"],["chemical weathering","general"]],"Freeze-thaw is physical."),
+ Q("A tree grows on a rock and its roots split it. This is…","biological weathering",[["physical weathering","general"],["chemical weathering","general"]],"Living things: biological."),
+ Q("Acid rain wears away a statue. This is…","chemical weathering",[["biological weathering","general"],["physical weathering","general"]],"Acid reacts with the rock."),
+ Q("A climber says the rocks never change. Why does she not notice weathering?","it happens very slowly",[["it only happens at night","general"],["rocks cannot be weathered","general"]],"It takes many years.")]);
 
 /* ============ key words, true or false, fill the gaps, put in order ============ */
 /* terms: [word, meaning, key note]. tf: [true statement, false statement, why, key note]. gap: [text with [gaps], spare words, key note]. order: [question, steps, key note, level].
