@@ -736,6 +736,19 @@ details.seeans{margin-top:6px}
 .findq .fq-l{display:block;font-size:13px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:var(--accent);margin-bottom:4px}
 .findq p{margin:0;font-size:21px;line-height:1.35;font-weight:700}
 .againlab{margin:14px 0 6px}
+.mtbtn{margin-top:10px}
+.mtbig{font-size:56px;line-height:1}
+.mtrules{text-align:left;font-size:19px;line-height:1.7;margin:6px auto 14px;padding-left:22px}
+.mtscore{font-size:64px;font-weight:800;line-height:1.1}.mtscore span{font-size:30px;opacity:.6}
+.mtstars{font-size:40px;letter-spacing:6px;color:var(--line,#ccd)}.mtstars .on{color:#f5b301}
+.mtpb{font-weight:800;color:var(--accent)}
+.mtwrong{border-top:1px solid var(--line,#dde);padding:10px 0}.mtwrong p{margin:6px 0}
+.mtbars{display:flex;gap:8px;align-items:flex-end;height:90px;margin-top:8px}.mtbars span{flex:1;max-width:36px;height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center}
+.mtbars i{display:block;width:100%;background:var(--accent);border-radius:6px 6px 0 0}.mtbars b{font-size:12px}
+.mtest .opt.ok,.mtest .opt.no{background:var(--accent-soft,#e6e9ff)!important;border-color:var(--accent)!important;color:inherit!important}
+.mtest:has(.opt.no) .opt.ok,.mtest .opt.right:not(.ok):not(.no){background:inherit!important;border-color:var(--line,#dde)!important;color:inherit!important;opacity:.55}
+.mtest input.ok,.mtest input.no{border-color:var(--accent)!important;background:inherit!important;color:inherit!important}
+.mtest .opt .mk,.mtest .opt .tick{display:none}
 table.dtab{border-collapse:collapse;margin:8px auto;font-size:16px;font-variant-numeric:tabular-nums}
 table.dtab th,table.dtab td{border:1.5px solid var(--line,#ccd);padding:6px 10px;text-align:center}
 table.dtab th{background:var(--surface);font-weight:700}
@@ -5962,7 +5975,7 @@ bank({id:"po.ren4",topic:"power",lvl:4.4,type:"idea",big:["energy"],note:"po3a"}
  Q("Why might a town choose a nuclear power station rather than a gas one?","it gives out no carbon dioxide",[["its waste is safe","general"],["it is renewable","renewable-mixup"]],"Gas releases carbon dioxide."),
  Q("A disadvantage of hydroelectric power is…","it costs a lot to build",[["it will run out","renewable-mixup"],["it makes smoke","general"]],"Dams are expensive and flood land."),
  Q("Solar panels can lower a home's electricity bill because…","sunlight is free",[["they make heat","general"],["they use less sunlight","general"]],"You buy less electricity from the grid.")]);
-bank({id:"po.data4",topic:"power",lvl:4.3,type:"idea",big:["energy","evidence"],note:"po3a"},[
+bank({id:"po.data4",topic:"power",lvl:3.7,type:"idea",big:["energy","evidence"],note:"po3a"},[
  ()=>{const a=pick([600,700,810,900]),b=pick([500,630,750,800]),c=pick([870,950,1000,1100]);const s=a+b+c;const av=s/3;if(Math.abs(av-Math.round(av))>1e-9)return Q("Use the table. What is the average monthly energy?","700 MJ",[["2100 MJ","general","That is the total. Now divide by 3."],["900 MJ","general"]],"Add them up, then divide by 3.",{fig:tbl(["Month","Energy (MJ)"],[["Apr","600"],["May","900"],["Jun","600"]])});
    return Q(`Use the table. What is the average monthly energy?`,`${fmt(av)} MJ`,[[`${fmt(s)} MJ`,"general","That is the total. Now divide by 3."],[`${fmt(Math.max(a,b,c))} MJ`,"general"]],"Add them up, then divide by 3.",{fig:tbl(["Month","Energy (MJ)"],[["Jan",a],["Feb",b],["Mar",c]])});}]);
 bank({id:"ci.dig4",topic:"circuits",lvl:4.7,type:"idea",big:["electricity"],note:"ciD4"},[
@@ -5984,7 +5997,7 @@ bank({id:"pa.gas4",topic:"particles",lvl:4.1,type:"idea",big:["particles"],note:
  Q("A balloon is put in a freezer. The volume of the balloon…","decreases",[["increases","general"],["stays the same","general"]],"Slower particles, smaller balloon."),
  Q("A gas is heated in a sealed box. Its particles…","move faster",[["get bigger","general","The particles stay the same size."],["stop","general"]],"Hotter means faster particles."),
  Q("Gas particles hit the walls of a balloon. This causes…","pressure",[["weight","general"],["friction","general"]],"Pressure comes from the hits on the walls.")]);
-bank({id:"he.graph4",topic:"heat",lvl:4.6,type:"idea",big:["energy","evidence"],note:"he3c"},[
+bank({id:"he.graph4",topic:"heat",lvl:3.8,type:"idea",big:["energy","evidence"],note:"he3c"},[
  ()=>{const a=[90,80,72,66,62],b=[90,74,62,54,49];return Q("Two cups of hot water cool down. One is wrapped in material 1, one in material 2. Which material is the better insulator?","material 1",[["material 2","general","Material 2 lost heat faster."],["they are the same","general"]],"The better insulator keeps it hotter for longer.",{fig:tbl(["Time (min)","0","5","10","15","20"],[["Material 1",...a],["Material 2",...b]])});},
  ()=>{const s=pick([[90,80,72,66],[85,76,69,64],[80,70,63,58]]);const nx=s[3]-(s[2]-s[3])+1;return Q(`The water cools. The pattern carries on. Predict the temperature at 20 minutes.`,`about ${nx} °C`,[[`about ${s[3]+6} °C`,"general","It is still cooling, so it gets lower."],["about 0 °C","general","It cools more slowly each time."]],"It drops by a bit less each time.",{fig:tbl(["Time (min)","0","5","10","15","20"],[["Temp (°C)",...s,"?"]])});},
  Q("Two containers of boiling water are wrapped in different materials. To make it a fair test, keep the same…","volume of water",[["material","general","That is what you are testing."],["final temperature","general"]],"Also the same thickness of material and starting temperature."),
@@ -7019,7 +7032,7 @@ function next(){
   if(!sess.block||sess.block.left<=0||!av.includes(sess.block.t)){
     const prev=sess.block;const b=chooseBlock();if(!b)return renderHome();
     sess.block=b;S.blockNo++;S.tp[b.t].lastBlock=S.blockNo;save();
-    if(!prev||prev.t!==b.t||prev.asked)return renderSwitch(b,!prev,prev);
+    if(!prev||prev.t!==b.t||prev.asked){if(prev&&mtDue())return mtOffer(b,prev);return renderSwitch(b,!prev,prev);}
   }
   const t=sess.block.t;const f=selectFamily(t);
   /* notes below the starting level are not forced while the pupil is working at or above that level */
@@ -7528,7 +7541,7 @@ function pupilSummary(){
   const big={};BIGS.forEach(g=>{const s=bigStrength(g);if(s!=null)big[g]={s,gap:bigFoundGap(g)?1:0};});
   const tags=Object.entries(S.tags).filter(([g,v])=>MC[g]&&g!=="general"&&!v.cleared).sort((a,b)=>b[1].count-a[1].count).slice(0,6).map(([g,v])=>[g,v.count,v.topic||""]);
   return {v:1,name:S.name||"",cls:S.cls||"",goal:S.goal,start:S.start,ans:S.answered,rec:runAvg(),last:NOW(),tp,big,tags,stu:S.studied||0,skip:S.skipped||0,nb:(S.nb||[]).length,
-    due:Object.values(S.mem||{}).filter(m=>m.ok>0&&m.due<=NOW()).length};}
+    due:Object.values(S.mem||{}).filter(m=>m.ok>0&&m.due<=NOW()).length,mt:S.mt&&S.mt.cnt?{best:S.mt.best,last:S.mt.last,cnt:S.mt.cnt,n:MT_N}:null};}
 async function cloudSync(force){
   if(CLOUD.state!=="on")return;if(CLOUD.busy){CLOUD.again=true;return;}CLOUD.busy=true;
   try{const sum=pupilSummary();const js=JSON.stringify({...sum,last:0});
@@ -7576,8 +7589,8 @@ async function drawTeacher(){
    <div class="panel row-b"><label class="q" for="tcls">Class</label><select id="tcls"><option value="">All classes (${all.length})</option>${classes.map(c=>`<option value="${esc(c)}" ${c===TEACH.cls?"selected":""}>${esc(c)} (${all.filter(r=>(r.cls||"(no class)")===c).length})</option>`).join("")}</select></div>
    ${live?`<div class="panel"><label class="setrow"><input type="checkbox" role="switch" class="swi" id="cfocus" ${CLASSCFG.focus?"checked":""}><span><b>Focus mode for everyone</b><span class="soft small">Hides joules, streaks, quests, mystery boxes and the shop on every pupil’s app</span></span></label></div>`:""}
    ${rows.length?`<div class="tstats"><div><b>${rows.length}</b><span>pupils</span></div><div class="${found.length?"warnstat":""}"><b>${found.length}</b><span>at Foundations in a topic</span></div><div><b>${rows.filter(r=>r.rec!=null&&r.rec<0.6).length}</b><span>finding it hard right now</span></div><div><b>${rows.filter(r=>(NOW()-(r.last||0))>7*DAY).length}</b><span>not active this week</span></div></div>
-   <div class="panel"><h3>Pupils · most in need first</h3><div class="tscroll"><table class="t track tdash"><tr><th>Pupil</th>${TOPICS.map(t=>`<th title="${TOPIC[t].t}">${TIC[TOPIC[t].ic]}</th>`).join("")}<th>Recent</th><th>Active</th></tr>
-    ${rows.map((r,i)=>`<tr class="trow" data-i="${i}"><td><b>${nm(r)}</b>${r.cls&&!TEACH.cls?` <span class="soft small">${esc(r.cls)}</span>`:""}${Object.values(r.tp||{}).some(x=>x.f)?` <span class="lvchip found">F</span>`:""}</td>${TOPICS.map(t=>`<td>${chip((r.tp||{})[t],t)}</td>`).join("")}<td class="num">${r.rec!=null?Math.round(r.rec*100)+"%":"–"}</td><td class="small">${ago(r.last)}</td></tr>`).join("")}</table></div>
+   <div class="panel"><h3>Pupils · most in need first</h3><div class="tscroll"><table class="t track tdash"><tr><th>Pupil</th>${TOPICS.map(t=>`<th title="${TOPIC[t].t}">${TIC[TOPIC[t].ic]}</th>`).join("")}<th>Recent</th><th title="Mini test: last (best)">📝</th><th>Active</th></tr>
+    ${rows.map((r,i)=>`<tr class="trow" data-i="${i}"><td><b>${nm(r)}</b>${r.cls&&!TEACH.cls?` <span class="soft small">${esc(r.cls)}</span>`:""}${Object.values(r.tp||{}).some(x=>x.f)?` <span class="lvchip found">F</span>`:""}</td>${TOPICS.map(t=>`<td>${chip((r.tp||{})[t],t)}</td>`).join("")}<td class="num">${r.rec!=null?Math.round(r.rec*100)+"%":"–"}</td><td class="num small">${r.mt?`${r.mt.last}/${r.mt.n||8} <span class="soft">(${r.mt.best})</span>`:"–"}</td><td class="small">${ago(r.last)}</td></tr>`).join("")}</table></div>
     <p class="soft small">F = Foundations (below N3). ✓ = goal reached. ⧗ = goal met once, waiting for a check on another day. Tap a pupil for details.</p></div>
    <div id="tdetail"></div>
    ${found.length?`<div class="panel foundp"><h3>🧱 Foundations</h3><ul class="advice">${TOPICS.map(t=>{const p=rows.filter(r=>r.tp&&r.tp[t]&&r.tp[t].f);return p.length?`<li><b>${TOPIC[t].t}:</b> ${p.map(nm).join(", ")}</li>`:"";}).join("")}</ul><p class="soft small">These pupils need the basics first: everyday examples, a demonstration and a short check-in before N3 work.</p></div>`:""}
@@ -7856,11 +7869,12 @@ function renderHome(){
    ${fo?"":passBars()}
    <div class="next"><div><p class="soft small">Up next</p><h2>${nx.label}</h2><p class="soft small">${nx.why}</p></div>
     <button class="btn primary wide big-go" id="cont" ${av.length?"":"disabled"}>${S.answered?"Continue":"Start"}</button>
+    ${av.length&&S.answered>=5?`<button class="btn wide mtbtn" id="mtStart">📝 Take a mini test${S.mt&&S.mt.cnt?` <span class="soft small">(best ${S.mt.best} out of ${MT_N})</span>`:""}</button>`:""}
     ${allDone&&S.goal<4?`<div class="aim"><p><b>Ready for more?</b> You’ve reached N${S.goal} in everything you chose.</p><button class="btn small" id="aimUp">Aim for N${S.goal+1}</button></div>`:""}</div>
    ${fo?learnPanel():todayPanel()+badgePanel()}
    <details class="panel unitstab" id="unitsTab" ${S.unitsOpen||!av.length?"open":""}><summary><h3>My units</h3><span class="soft small">${COURSE.filter(u=>u.topics.some(t=>S.on[t])).length} of ${COURSE.length} on</span></summary><div class="row-b"><p class="soft small">Switch on the units you want in your questions.</p><button class="link" id="allOn">All on</button></div>${includeList(false)}</details>
    <nav class="homelinks"><button class="btn" data-go="track">Tracking</button><button class="btn" data-go="lab">Virtual lab</button>${fo?"":`<button class="btn" data-go="shop">Shop</button>`}<button class="btn" data-go="settings">Settings</button></nav>`);
-  document.getElementById("cont").onclick=startSession;if(av.length)document.getElementById("cont").focus({preventScroll:true});
+  document.getElementById("cont").onclick=startSession;{const mts=document.getElementById("mtStart");if(mts)mts.onclick=()=>miniTest({});}if(av.length)document.getElementById("cont").focus({preventScroll:true});
   document.getElementById("allOn").onclick=()=>{TOPICS.forEach(t=>S.on[t]=true);save();renderHome();};
   const au=document.getElementById("aimUp");if(au)au.onclick=()=>{S.goal++;TOPICS.forEach(t=>S.tp[t].reached=false);resetLocks();S.units={};save();toast(`New goal: N${S.goal}`,0,{info:true});renderHome();};
   wireInclude(renderHome);
@@ -7916,6 +7930,7 @@ function renderTrack(){
    ${(()=>{const fd=TOPICS.filter(t=>S.on[t]&&atFoundations(t));return fd.length?`<div class="panel foundp"><h3>🧱 Foundations</h3><p>Working on the basics in <b>${fd.map(t=>TOPIC[t].t).join(", ")}</b>.</p><p class="soft small">Foundations is the level below N3. It covers the very basics: what matter is made of, solids, liquids and gases, pushes and pulls, hot and cold, energy in everyday life, and measuring with the right units. Teachers: these topics need targeted support.</p></div>`:"";})()}
    <div class="panel"><h3>Topics</h3><div class="tscroll"><table class="t track"><tr><th>Topic</th><th>Level</th><th class="tw">Towards N${S.goal}</th><th>Ideas</th><th>Calcs</th><th></th></tr>${rows}</table></div>
     <p class="soft small">Level is the level you are working at now. Foundations is the level below N3. Secure means you get that level right again and again. Ideas and Calcs are your recent success.</p></div>
+   ${mtPanel()}
    <div class="panel"><h3>Big ideas</h3><p class="soft small">These ideas run through many topics. Being good at heat but weak whenever particles come up is a sign to go back to the particle model.</p>${BIGS.map(g=>bigRow(g)).join("")}</div>
    <div class="panel"><h3>What to work on</h3><ul class="advice">${adviceList().map(x=>`<li>${x}</li>`).join("")}</ul></div>
    <div class="panel"><h3>Mistakes to watch</h3>${tags.length?`<div class="tscroll"><table class="t"><tr><th>Mistake</th><th>Times</th><th></th></tr>${tags.map(([g,v])=>`<tr><td>${MC[g].n}</td><td class="num">${v.count}</td><td>${v.cleared?`<span style="color:var(--good)">Fixed</span>`:`<span style="color:var(--bad)">Watch</span>`}</td></tr>`).join("")}</table></div>`:`<p class="soft">None yet.</p>`}</div>
@@ -8135,6 +8150,79 @@ const FOCUS={
   L.q=F.q;L.p=F.how;delete L.pred;L.tasks=null;if(F.hide)L.hide=[].concat(F.hide);
   let c=(L.c||[]).map(x=>({...x}));if(F.rep)for(const i in F.rep)c[+i]=F.rep[i];if(F.rw)for(const i in F.rw)if(c[+i])c[+i].q=F.rw[i];
   if(F.ord)c=F.ord.map(i=>c[i]).concat(c.filter((_,i)=>!F.ord.includes(i)));L.c=c;}})();
+
+/* ============ mini tests: 8 questions from your units, no hints until the end ============ */
+Object.assign(BADGES,{mt1:["📝","First mini test"],mtpb:["📈","Beat your mini test best"],mt8:["🏆","Full marks in a mini test"]});
+const MT_N=8;
+function mtState(){if(!S.mt||typeof S.mt!=="object")S.mt={best:0,cnt:0,hist:[]};return S.mt;}
+function mtDue(){return !!(sess&&S.answered>=20&&sess.count-(sess.mtAt||0)>=18&&availableTopics().length);}
+function mtOk(f){return !/^(gp|or|un|x\d+)\./.test(f.id)&&f.type!=="write"&&f.lvl<5;}
+function mtItem(f){
+  for(let k=0;k<6;k++){let it;try{it=makeItem(f,null,true);}catch(e){return null;}
+    if(it.calc)return {...typeFromCalc(it),fam:f.id,lvl:it.lvl||f.lvl,big:it.big||f.big,ftype:"calc"};
+    if(!it.kind||it.kind==="mc"){if(it.opts&&it.opts.length>=2&&it.opts.filter(o=>o.ok).length===1)return it;}}
+  return null;}
+function mtBuild(){
+  const av=shuffle(availableTopics().slice());if(!av.length)return [];
+  const lowStart=av.some(t=>workLevel(t)<3);const lo=lowStart?2.4:3;const used=new Set();const out=[];
+  const pool=(t,a,b)=>FAMS.filter(f=>f.topic===t&&mtOk(f)&&!used.has(f.id)&&f.lvl>=a&&f.lvl<b);
+  const hiOf=t=>Math.min(S.goal+0.99,Math.max(workLevel(t)+0.9,3.6));
+  const coreLo=Math.max(lo,S.goal-0.5);const DATA=/table|data|graph|osc|fair/;
+  const plan=S.goal>=4?["n3","n3","calc","core","data","calc","core","stretch"]:["n3","n3","core","data","core","calc","core","stretch"];
+  let ti=0,guard=0;
+  while(out.length<MT_N&&guard++<120){const kind=plan[out.length];const t=av[ti++%av.length];
+    const core=pool(t,coreLo,hiOf(t));let list=kind==="n3"?pool(t,lo,4):kind==="stretch"?pool(t,Math.max(S.goal+0.4,hiOf(t)-0.3),S.goal+1.2)
+      :kind==="calc"?pool(t,lo,hiOf(t)+0.2).filter(f=>f.type==="calc"):kind==="data"?pool(t,lo,hiOf(t)+0.2).filter(f=>DATA.test(f.id)):core;
+    if(!list.length&&guard<60&&(kind==="calc"||kind==="data"))continue; /* try the next topic first */
+    if(!list.length)list=core.length?core:pool(t,lo,hiOf(t)+0.3);if(!list.length)continue;
+    const f=pick(list);const it=mtItem(f);if(!it)continue;used.add(f.id);out.push(it);}
+  return out;}
+function mtOffer(b,prev){
+  sess.mtAt=sess.count;const m=mtState();
+  screen(`${slim("")}<div class="center col switch" style="padding-top:7vh"><div class="mtbig">📝</div><h1>Mini test ready</h1>
+   <p class="soft">${MT_N} questions from your units. No hints until the end.${m.cnt?` Can you beat your best of <b>${m.best} out of ${MT_N}</b>?`:" See how ready you are."}</p>
+   <button class="btn primary wide big-go" id="go">Start the mini test</button><button class="btn wide" id="later">Not now</button></div>`);
+  const g=document.getElementById("go");g.onclick=()=>miniTest({after:()=>renderSwitch(b,false,prev)});g.focus({preventScroll:true});
+  document.getElementById("later").onclick=()=>renderSwitch(b,false,prev);}
+function miniTest(o={}){
+  const items=mtBuild();if(items.length<4){toast("Switch on a unit first, then try a mini test.",0,{info:true});return o.after?o.after():renderHome();}
+  const m=mtState();
+  screen(`${slim("")}<div class="center col" style="padding-top:6vh"><div class="mtbig">📝</div><h1>Mini test</h1>
+   <ul class="mtrules"><li>${items.length} questions</li><li>No hints until the end</li><li>Take your time. Do your best.</li></ul>
+   ${m.cnt?`<p class="soft">Your best: <b>${m.best} out of ${MT_N}</b></p>`:""}
+   <button class="btn primary wide big-go" id="go">Start</button><button class="btn wide" id="back">Not now</button></div>`);
+  const g=document.getElementById("go");g.onclick=()=>mtAsk(items,0,[],o);g.focus({preventScroll:true});
+  document.getElementById("back").onclick=()=>o.after?o.after():renderHome();}
+function mtAsk(items,k,res,o){
+  if(k>=items.length)return mtResults(items,res,o);
+  const it=items[k];const f=FAM[it.fam];window.scrollTo({top:0});
+  screen(`${slim(`<div class="qtop">${topicChip(f.topic)}${seg(items.length,k)}</div>`)}<p class="tag">📝 Mini test · ${k+1} of ${items.length}</p><div id="qbox" class="mtest"></div>`);
+  let done=false;
+  renderItem(document.getElementById("qbox"),{...it,try2:false},r=>{if(done)return;done=true;
+    record(it,f,r.ok,{weight:0.6,mem:false});res.push({ok:!!r.ok});save();
+    setTimeout(()=>mtAsk(items,k+1,res,o),it.kind==="type"?250:450);});}
+function mtAnswer(it){if(it.kind==="type")return `${it.pre||""}${U(it.okVal,it.unit)}`;const c=(it.opts||[]).find(x=>x.ok);return c?c.h:"";}
+function mtResults(items,res,o){
+  const sc=res.filter(r=>r.ok).length,n=items.length;const m=mtState();const pb=m.cnt>0&&sc>m.best;const first=!m.cnt;
+  m.cnt++;m.last=sc;m.best=Math.max(m.best,sc);m.hist.push({at:NOW(),s:sc,n});m.hist=m.hist.slice(-20);
+  const fo=focusOn();let j=award(sc*4,{raw:true});badge("mt1");if(pb){j+=award(20,{raw:true});badge("mtpb");}if(sc===n)badge("mt8");save();cloudSync();
+  if(!fo&&sc/n>=0.75)setTimeout(()=>confetti(sc===n?120:60),200);
+  const stars=sc===n?3:sc/n>=0.75?2:sc/n>=0.5?1:0;
+  const msg=sc===n?"Full marks! You are test-ready on these.":sc/n>=0.75?"Great work. You are nearly test-ready.":sc/n>=0.5?"Good. A few to fix, then you will be flying.":"A good start. Practise these, then try again.";
+  const wrong=items.map((it,i)=>({it,ok:res[i]&&res[i].ok})).filter(x=>!x.ok);
+  const clip=h=>{const t=String(h||"").replace(/<[^>]+>/g," ").replace(/&nbsp;/g," ").replace(/\s+/g," ").trim();return t.length>110?t.slice(0,107)+"…":t;};
+  screen(`${slim("")}<div class="center col" style="padding-top:4vh"><p class="tag">Mini test${j&&!fo?` · +${j} J`:""}</p>
+    <div class="mtscore">${sc}<span> / ${n}</span></div><div class="mtstars">${[0,1,2].map(i=>`<span class="${i<stars?"on":""}">★</span>`).join("")}</div>
+    <p>${msg}</p>${pb?`<p class="mtpb">📈 New personal best!</p>`:first?`<p class="soft small">Your first mini test. Try to beat it next time.</p>`:`<p class="soft small">Your best: ${m.best} out of ${MT_N}</p>`}
+    <button class="btn primary wide" id="mtgo">Carry on ›</button></div>
+   ${wrong.length?`<div class="panel"><h3>What to work on</h3>${wrong.map((x,i)=>{const f=FAM[x.it.fam];return `<div class="mtwrong">${topicChip(f.topic)}<p>${clip(x.it.q)}</p><p class="small"><b>Answer:</b> ${mtAnswer(x.it)}</p><button class="btn small" data-mtp="${f.topic}">Practise ${TOPIC[f.topic].t}</button></div>`;}).join("")}</div>`:""}
+   <button class="btn wide" data-go="home">Home</button>`);
+  const g=document.getElementById("mtgo");g.onclick=()=>o.after?o.after():startSession();g.focus({preventScroll:true});
+  main.querySelectorAll("[data-mtp]").forEach(b=>b.onclick=()=>practiseTopic(b.dataset.mtp));}
+function practiseTopic(t){if(!sess){sess=newSess();holdRewards(true);}const b={t,left:5,len:5,extra:0,right:0,asked:0};sess.block=b;S.blockNo++;S.tp[t].lastBlock=S.blockNo;save();renderSwitch(b,true,null);}
+function mtPanel(){const m=mtState();if(!m.cnt)return `<div class="panel"><h3>📝 Mini tests</h3><p class="soft small">No mini tests yet. Take one from the home page.</p></div>`;
+  const h=m.hist.slice(-8);return `<div class="panel"><h3>📝 Mini tests</h3><p>Best: <b>${m.best} out of ${MT_N}</b> · Last: <b>${m.last} out of ${MT_N}</b> · Taken: ${m.cnt}</p>
+   <div class="mtbars">${h.map(x=>`<span title="${x.s} out of ${x.n}"><i style="height:${Math.max(6,x.s/x.n*100)}%"></i><b>${x.s}</b></span>`).join("")}</div></div>`;}
 
 /* ============ boot ============ */
 if(typeof document!=="undefined"&&document.getElementById("main")){
