@@ -5935,7 +5935,7 @@ calcFam({id:"po.eff4",topic:"power",lvl:4.6,big:["energy","proportion"],note:"po
     Fw:[["efficiency = total ÷ useful × 100","formula-wrong"],["efficiency = useful × total","formula-wrong"]],sub:`efficiency = ${fmt(use)} ÷ ${fmt(tot)} × 100`,
     subW:[[`efficiency = ${fmt(tot)} ÷ ${fmt(use)} × 100`,"formula-wrong"],[`efficiency = ${fmt(use)} ÷ ${fmt(tot)}`,"general"]],wv:[[tot/use*100,"formula-wrong"],[use/tot,"general"],[100-pc,"general"]],units:["pc","J","W","s"]});});
 calcFam({id:"po.eff4b",topic:"power",lvl:4.9,big:["energy","proportion"],note:"poE4",tags:["formula-wrong","power-energy"]},()=>{
-  const P=pick([800,1000,1600,2000]),t=pick([50,100,125,200,250]);const E=P*t;const pc=pick([40,50,60,75,80]);const use=E*pc/100;
+  const P=pick([800,1000,1500,2000,2400]),t=pick([50,100,120,200,300]);const E=P*t;const pc=pick([40,50,60,75,80]);const use=E*pc/100;
   return calcItem(`A ${P} W kettle is on for ${t} s. The water gains ${fmt(use)} J of heat. First find the energy supplied. Then calculate the percentage efficiency.`,{sym:"efficiency",ans:pc,unit:"%",uk:"pc",
     K:[`P = ${P} W`,`t = ${t} s`,`E = ${P} × ${t} = ${fmt(E)} J`,`useful = ${fmt(use)} J`],F:"efficiency = useful ÷ total × 100",
     Fw:[["efficiency = total ÷ useful × 100","formula-wrong"],["efficiency = P ÷ t","power-energy"]],sub:`efficiency = ${fmt(use)} ÷ ${fmt(E)} × 100`,
@@ -5963,7 +5963,7 @@ bank({id:"po.ren4",topic:"power",lvl:4.4,type:"idea",big:["energy"],note:"po3a"}
  Q("A disadvantage of hydroelectric power is…","it costs a lot to build",[["it will run out","renewable-mixup"],["it makes smoke","general"]],"Dams are expensive and flood land."),
  Q("Solar panels can lower a home's electricity bill because…","sunlight is free",[["they make heat","general"],["they use less sunlight","general"]],"You buy less electricity from the grid.")]);
 bank({id:"po.data4",topic:"power",lvl:4.3,type:"idea",big:["energy","evidence"],note:"po3a"},[
- ()=>{const a=pick([600,700,820,900]),b=pick([500,640,740,800]),c=pick([860,960,1000,1100]);const s=a+b+c;const av=s/3;if(Math.abs(av-Math.round(av))>1e-9)return Q("A wind turbine makes 820 MJ in January, 740 MJ in February and 960 MJ in March. What is the average monthly energy?","840 MJ",[["2520 MJ","general","That is the total. Now divide by 3."],["960 MJ","general"]],"Add them up, then divide by 3.",{fig:tbl(["Month","Energy (MJ)"],[["Jan","820"],["Feb","740"],["Mar","960"]])});
+ ()=>{const a=pick([600,700,810,900]),b=pick([500,630,750,800]),c=pick([870,950,1000,1100]);const s=a+b+c;const av=s/3;if(Math.abs(av-Math.round(av))>1e-9)return Q("Use the table. What is the average monthly energy?","700 MJ",[["2100 MJ","general","That is the total. Now divide by 3."],["900 MJ","general"]],"Add them up, then divide by 3.",{fig:tbl(["Month","Energy (MJ)"],[["Apr","600"],["May","900"],["Jun","600"]])});
    return Q(`Use the table. What is the average monthly energy?`,`${fmt(av)} MJ`,[[`${fmt(s)} MJ`,"general","That is the total. Now divide by 3."],[`${fmt(Math.max(a,b,c))} MJ`,"general"]],"Add them up, then divide by 3.",{fig:tbl(["Month","Energy (MJ)"],[["Jan",a],["Feb",b],["Mar",c]])});}]);
 bank({id:"ci.dig4",topic:"circuits",lvl:4.7,type:"idea",big:["electricity"],note:"ciD4"},[
  Q("Which is a digital input device?","switch",[["LDR","general","An LDR changes smoothly: analogue."],["microphone","general","A microphone is analogue."]],"A switch is only on or off."),
@@ -5994,11 +5994,11 @@ bank({id:"he.graph4",topic:"heat",lvl:4.6,type:"idea",big:["energy","evidence"],
 
 /* ---------- Waves and Radiation ---------- */
 calcFam({id:"wa.fsml4",topic:"waves",lvl:4.5,big:["waves","proportion"],note:"wa4a",tags:["formula-wrong"]},()=>{
-  const N=pick([2,4,5,6,10]),t=pick([20,40,50,60,100]);const f=N/t;if(fmt(f).length>5)return calcItem(`A wave machine makes 5 waves in 50 s. Calculate the frequency.`,{sym:"f",ans:0.1,unit:"Hz",uk:"Hz",K:["N = 5","t = 50 s","f = ?"],F:"f = N / t",Fw:[["f = N × t","formula-wrong"],["f = t / N","formula-wrong"]],sub:"f = 5 / 50",subW:[["f = 50 / 5","formula-wrong"]],wv:[[250,"formula-wrong"],[10,"formula-wrong"]],units:U_WV});
+  const N=pick([2,3,4,6,10]),t=pick([20,30,40,60,100]);const f=N/t;if(fmt(f).length>5)return calcItem(`A wave machine makes 4 waves in 40 s. Calculate the frequency.`,{sym:"f",ans:0.1,unit:"Hz",uk:"Hz",K:["N = 4","t = 40 s","f = ?"],F:"f = N / t",Fw:[["f = N × t","formula-wrong"],["f = t / N","formula-wrong"]],sub:"f = 4 / 40",subW:[["f = 40 / 4","formula-wrong"]],wv:[[160,"formula-wrong"],[10,"formula-wrong"]],units:U_WV});
   return calcItem(`A wave machine makes ${N} waves in ${t} s. Calculate the frequency.`,{sym:"f",ans:f,unit:"Hz",uk:"Hz",K:[`N = ${N}`,`t = ${t} s`,"f = ?"],
     F:"f = N / t",Fw:[["f = N × t","formula-wrong"],["f = t / N","formula-wrong"]],sub:`f = ${N} / ${t}`,subW:[[`f = ${t} / ${N}`,"formula-wrong"]],wv:[[N*t,"formula-wrong"],[t/N,"formula-wrong"]],units:U_WV});});
 calcFam({id:"wa.vfl4b",topic:"waves",lvl:4.8,big:["waves","proportion"],note:"wa4b",tags:["formula-wrong"]},()=>{
-  const N=pick([5,4,2,10]),t=pick([50,20,40]),l=pick([2,3,4,5]);const f=N/t,v=f*l;
+  const N=pick([3,4,2,10]),t=pick([30,20,40]),l=pick([2,3,5,6]);const f=N/t,v=f*l;
   return calcItem(`A wave machine makes ${N} waves in ${t} s. The wavelength is ${l} m. First find the frequency. Then calculate the speed of the waves.`,{sym:"v",ans:v,unit:MS,uk:"ms",
     K:[`f = ${N} / ${t} = ${fmt(f)} Hz`,`λ = ${l} m`,"v = ?"],F:"v = f λ",Fw:[["v = f / λ","formula-wrong"],["v = N × t","formula-wrong"]],sub:`v = ${fmt(f)} × ${l}`,
     subW:[[`v = ${N} × ${l}`,"general"],[`v = ${fmt(f)} / ${l}`,"formula-wrong"]],wv:[[N*l,"general"],[f/l,"formula-wrong"],[t/N*l,"formula-wrong"]],units:U_WV});});
@@ -6056,19 +6056,19 @@ calcFam({id:"fo.fma4",topic:"forces",lvl:4.7,big:["forces","proportion"],note:"f
     F:"a = F / m",Fw:[["a = F × m","formula-wrong"],["a = m / F","formula-wrong"]],sub:`a = ${fmt(F)} / ${fmt(m)}`,subW:[[`a = ${fmt(F)} × ${fmt(m)}`,"formula-wrong"]],wv:[[F*m,"formula-wrong"],[m/F,"formula-wrong"]],units:U});});
 bank({id:"fo.data4",topic:"forces",lvl:4.6,type:"idea",big:["forces","evidence"],note:"fo4a"},[
  ()=>{const k=pick([0.6,0.8,1.2]);const row=[2.5,5,7.5].map(F=>+(F*k*0.98).toFixed(1));const nx=+(10*k*0.98).toFixed(1);return Q("A pupil pulls a trolley with different forces. Suggest the acceleration for 10.0 N.",`about ${fmt(nx)} ${MS2}`,[[`about ${fmt(row[2])} ${MS2}`,"general","More force gives more acceleration."],[`about ${fmt(row[0])} ${MS2}`,"general"]],"Follow the pattern: it goes up by about the same each time.",{fig:tbl([`Force (N)`,`Acceleration (${MS2})`],[["2.5",row[0]],["5.0",row[1]],["7.5",row[2]],["10.0","?"]])});},
- Q("A force of 0.5 N pulls a trolley, but it moves at a steady speed. Why does it not accelerate?","the forces on it are balanced",[["there is no gravity","general"],["it has no mass","general"]],"Friction is equal and opposite to the pull."),
+ Q("A small pull makes a trolley move at a steady speed. Why does it not accelerate?","the forces on it are balanced",[["there is no gravity","general"],["it has no mass","general"]],"Friction is equal and opposite to the pull."),
  Q("To find the average speed of a cyclist between two lamp posts, you time it and measure the…","distance between the lamp posts",[["mass of the bike","general"],["height of the lamp posts","general"]],"Speed = distance ÷ time."),
  Q("A skier wants to go faster. One way to reduce friction is to…","wear tight clothing",[["wear a big coat","general"],["stand up tall","general","That makes more air resistance."]],"Also: crouch low and keep skis flat.")]);
 bank({id:"fo.fair3",topic:"forces",lvl:3.7,type:"idea",big:["evidence"],note:"fo3b"},[
- ()=>{const r=pick([[53,56,56],[44,47,47],[22,23,15],[60,57,63]]);const av=(r[0]+r[1]+r[2])/3;return Q(`A ball is dropped three times. It bounces ${r[0]} mm, ${r[1]} mm and ${r[2]} mm. What is the average bounce height?`,`${fmt(av)} mm`,[[`${r[0]+r[1]+r[2]} mm`,"general","That is the total. Now divide by 3."],[`${Math.max(...r)} mm`,"general"]],"Add them, then divide by 3.");},
+ ()=>{const r=pick([[41,44,44],[34,37,37],[18,19,14],[60,57,63],[72,75,75]]);const av=(r[0]+r[1]+r[2])/3;return Q(`A ball is dropped three times. It bounces ${r[0]} mm, ${r[1]} mm and ${r[2]} mm. What is the average bounce height?`,`${fmt(av)} mm`,[[`${r[0]+r[1]+r[2]} mm`,"general","That is the total. Now divide by 3."],[`${Math.max(...r)} mm`,"general"]],"Add them, then divide by 3.");},
  Q("Pupils test how high a ball bounces on different floors. To make it fair, keep the same…","ball and drop height",[["floor","general","The floor is what you are testing."],["bounce height","general"]],"Change only one thing."),
- Q("Concrete is harder than wood. The ball bounced 55 mm on wood. Predict the bounce on concrete.","higher than 55 mm",[["lower than 55 mm","general","Harder surfaces gave higher bounces."],["0 mm","general"]],"Follow the pattern in the results."),
+ Q("In the results, harder floors gave higher bounces. The ball bounced 40 mm on lino. Marble is harder than lino. Predict the bounce on marble.","higher than 40 mm",[["lower than 40 mm","general","Harder surfaces gave higher bounces."],["0 mm","general"]],"Follow the pattern in the results."),
  Q("Why repeat each drop three times?","to get a more reliable average",[["to make the ball bounce higher","general"],["to change the floor","general"]],"One odd result matters less."),
  Q("A satellite is pulled towards the Earth by…","gravity (its weight)",[["air resistance","general"],["friction","general"]],"Gravity keeps it in orbit."),
  Q("A satellite enters the atmosphere and slows down. Which force slows it?","air resistance (friction)",[["gravity","general"],["magnetism","general"]],"Air rubs against it."),
  Q("As the satellite slows down in the atmosphere, its kinetic energy becomes…","heat",[["light only","general"],["mass","general"]],"Friction makes heat.")]);
 calcFam({id:"sy.dvt4",topic:"space",lvl:4.8,big:["space","proportion"],note:"sy4a",tags:["formula-wrong"]},()=>{
-  const t=pick([0.1,0.12,0.2,0.25,0.5,1.3]);const v=300000000;const d=v*t;
+  const t=pick([0.1,0.12,0.2,0.3,0.4,1.3]);const v=300000000;const d=v*t;
   return calcItem(`A radio signal goes from America to Scotland by satellite. It takes ${fmt(t)} s. Radio signals travel at 300 000 000 ${MS}. Calculate the distance.`,{sym:"d",ans:d,unit:"m",uk:"m",
     K:[`v = 300 000 000 ${MS}`,`t = ${fmt(t)} s`,"d = ?"],F:"d = v t",Fw:[["d = v / t","formula-wrong"],["d = t / v","formula-wrong"]],sub:`d = 300 000 000 × ${fmt(t)}`,subW:[[`d = 300 000 000 / ${fmt(t)}`,"formula-wrong"]],wv:[[v/t,"formula-wrong"],[d*10,"general"],[d/10,"general"]],units:["m","s","ms","kg"]});});
 bank({id:"sy.sat4",topic:"space",lvl:4.4,type:"idea",big:["space"],note:"sy4a"},[
@@ -6078,10 +6078,10 @@ bank({id:"sy.sat4",topic:"space",lvl:4.4,type:"idea",big:["space"],note:"sy4a"},
  Q("A weather satellite is in a lower orbit than a geostationary one. Its period is…","shorter",[["longer","general","Higher orbits take longer."],["the same","general"]],"Lower orbits take less time."),
  Q("A moon is…","a natural satellite of a planet",[["a small star","general"],["a planet that orbits a star","general"]],"Moons orbit planets.")]);
 bank({id:"sy.table4",topic:"space",lvl:4.3,type:"idea",big:["space","evidence"],note:"sy3a"},[
- ()=>{const rows=[["Titan",5150,16],["Rhea",1527,4.5],["Mimas",396,0.9],["Iapetus",1470,79],["Enceladus",504,1.4],["Dione",1123,2.7]];
-   const k=pick(["d","p"]);const fig=tbl(["Moon of Saturn","Diameter (km)","Orbit time (days)"],rows);
-   return k==="d"?Q("Use the table. Which moons have a diameter less than 600 km?","Mimas and Enceladus",[["Titan and Rhea","general","Those are the biggest."],["Mimas only","general","Check every row."]],"Look down the diameter column.",{fig})
-    :Q("Use the table. Which moon takes more than 20 days to orbit?","Iapetus",[["Titan","general","16 days is less than 20."],["Mimas","general"]],"Look down the orbit time column.",{fig});},
+ ()=>{const rows=[["Io",3643,1.8],["Europa",3122,3.6],["Amalthea",167,0.5],["Ganymede",5268,7.2],["Callisto",4821,16.7],["Himalia",140,251]];
+   const k=pick(["d","p"]);const fig=tbl(["Moon of Jupiter","Diameter (km)","Orbit time (days)"],rows);
+   return k==="d"?Q("Use the table. Which moons have a diameter less than 1000 km?","Amalthea and Himalia",[["Ganymede and Callisto","general","Those are the biggest."],["Amalthea only","general","Check every row."]],"Look down the diameter column.",{fig})
+    :Q("Use the table. Which moon takes more than 20 days to orbit?","Himalia",[["Callisto","general","16.7 days is less than 20."],["Amalthea","general"]],"Look down the orbit time column.",{fig});},
  ()=>{const rows=[["Mercury",88],["Venus",225],["Earth",365],["Mars",687]];return Q("Use the table. What is the pattern?","planets further from the Sun take longer to orbit",[["planets further from the Sun orbit faster","general"],["all planets take the same time","general"]],"Read down the table.",{fig:tbl(["Planet (nearest first)","Orbit time (days)"],rows)});}]);
 bank({id:"sy.earth3",topic:"space",lvl:3.3,type:"idea",big:["space"],note:"syE3"},[
  Q("In one day, the Earth…","rotates once on its axis",[["orbits the Sun once","general","That takes a year."],["orbits the Moon","general"]],"One spin = one day."),
