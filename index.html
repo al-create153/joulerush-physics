@@ -736,6 +736,24 @@ details.seeans{margin-top:6px}
 .findq .fq-l{display:block;font-size:13px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:var(--accent);margin-bottom:4px}
 .findq p{margin:0;font-size:21px;line-height:1.35;font-weight:700}
 .againlab{margin:14px 0 6px}
+.qrow{position:relative}.qrow .prompt,.qrow .q{padding-right:52px}
+.qsay{position:absolute;right:0;top:-2px;width:44px;height:44px;border-radius:50%;border:2px solid var(--accent);background:var(--surface);font-size:20px;cursor:pointer;line-height:1}
+.qsay.saying{background:var(--accent);color:#fff}
+b.cmdw{color:var(--accent);font-weight:800}
+.cmdhelp{font-size:15px;margin:2px 0 10px;padding:6px 10px;border-radius:10px;background:var(--surface);border-left:4px solid var(--accent)}
+.ansline{font-size:19px;margin:6px 0}.because{margin:4px 0 2px}
+.confnote{font-weight:700;color:var(--bad,#c0392b)}
+.opt.sel{border-color:var(--accent)!important;box-shadow:0 0 0 3px var(--accent-weak,#dfe3ff)}
+.confbar{margin-top:14px;padding:12px 14px;border:2px solid var(--accent);border-radius:14px;background:var(--surface);text-align:center}
+.confbar p{margin:0 0 8px;font-weight:700}.confbtns{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.rwait .opt,.rwait .tk,.rwait .sbtn{opacity:.45}
+.rwaitbar{margin:0 0 10px;padding:8px 12px;border-radius:12px;background:var(--tape-weak,#fff4d6);border:1.5px solid var(--tape,#f0c040);font-weight:700}
+.youthink{margin:8px 0 0;font-size:16px}
+ul.ican{list-style:none;padding:0;margin:4px 0 10px}ul.ican li{display:flex;gap:10px;align-items:flex-start;padding:5px 0}
+.ick{flex:0 0 24px;height:24px;border-radius:50%;border:2px solid var(--line,#ccd);display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff}
+ul.ican li.done .ick{background:var(--good,#2e9e5b);border-color:var(--good,#2e9e5b)}
+.iclvl{margin:8px 0 0;font-weight:800;color:var(--accent)}details.icunit{border-top:1px solid var(--line,#dde);padding:8px 0}details.icunit>summary{cursor:pointer;font-size:17px}
+ul.misc{padding-left:18px}ul.misc li{margin:0 0 12px}.surechip{background:var(--bad-weak,#fde2e2);color:var(--bad,#c0392b);border-radius:8px;padding:1px 8px;font-size:13px;font-weight:700}
 .mtbtn{margin-top:10px}
 .mtbig{font-size:56px;line-height:1}
 .mtrules{text-align:left;font-size:19px;line-height:1.7;margin:6px auto 14px;padding-left:22px}
@@ -2395,7 +2413,7 @@ const BADGES={first:["✔️","First right answer"],run3:["👍","3 right in a r
  star1:["⭐","First star"],star3:["🌟","3 stars in one day"],star10:["🏵️","10 stars"],
  quest1:["📜","First quest done"],quest10:["🧭","10 quests done"],
  chest1:["🎁","First mystery box"],chest5:["🧰","5 mystery boxes"],shop1:["🛍️","First shop buy"],
- streak3:["🔥","3-day streak"],streak5:["🌞","5-day streak"],streak7:["🌈","7-day streak"],back1:["👋","Came back another day"],
+ back1:["👋","Came back another day"],
  lvlup:["⬆️","First level up"],level5:["🎖️","Level 5"],level10:["🥋","Level 10"],level15:["🦸","Level 15"],
  j250:["🪙","250 J earned"],j1000:["💰","1000 J earned"],j2500:["💎","2500 J earned"],j5000:["🏦","5000 J earned"],
  goal1:["🏁","First topic test ready"],unit1:["🏆","A whole unit test ready"]};
@@ -2526,15 +2544,6 @@ function addJ(x,tags=[],quiet){
 function payout(){const x=S.held||0;if(!x)return 0;S.held=0;addJ(x,["from your last block"]);return x;}
 function countCorrect(){
   rollDay();S.day.correct++;
-  if(S.day.correct===5&&S.streak.last!==S.day.date){
-    const y=dayOffset(1),y2=dayOffset(2);
-    if(S.streak.last===y)S.streak.n++;
-    else if(S.streak.last===y2&&S.freezes>0){S.freezes--;S.streak.n++;toast("🧊 Streak freeze used. Your streak is safe.");}
-    else S.streak.n=1;
-    S.streak.last=S.day.date;S.streak.best=Math.max(S.streak.best||0,S.streak.n);
-    setTimeout(()=>toast(S.streak.n>1?`🔥 ${S.streak.n}-day streak!`:"🔥 Streak started! Come back tomorrow to grow it."),500);
-    if(S.streak.n>=3)badge("streak3");if(S.streak.n>=5)badge("streak5");if(S.streak.n>=7)badge("streak7");
-  }
   S.chestProg=(S.chestProg||0)+1;
   if(S.chestProg>=8){S.chestProg=0;S.chests=(S.chests||0)+1;return true;}
   return false;
@@ -2547,7 +2556,7 @@ function todayPanel(){
    <div class="lvl"><div class="lvl-top"><b>Level ${L+1}</b><span>${LEVELS[L]}</span></div><div class="meter xp"><i style="width:${L>=LEVELS.length-1?100:(S.earned-lo)/(hi-lo)*100}%"></i></div><p class="soft small">${L>=LEVELS.length-1?"Top level!":`${hi-S.earned} J to level ${L+2}`}</p></div>
    <div class="stats">
     <div class="stat">${ring(p)}<div><b class="starrow">${"⭐".repeat(st)}<span class="nostar">${"☆".repeat(3-st)}</span></b><span>${st>=3?"All 3 stars today!":`${Math.max(1,sN-S.day.earned)} J to star ${st+1}`}</span></div></div>
-    <div class="stat"><div class="flame ${streakAlive()&&S.streak.n?"lit":""}">🔥</div><div><b>${streakAlive()?S.streak.n:0} day${(streakAlive()?S.streak.n:0)===1?"":"s"}</b><span>${S.streak.last===todayKey()?"Streak kept today":"Get 5 right to keep it going"}${S.freezes?` · 🧊${S.freezes}`:""}</span></div></div>
+    <div class="stat"><div class="flame lit">📒</div><div><b>${(S.nb||[]).length} key note${(S.nb||[]).length===1?"":"s"}</b><span>${TOPICS.filter(t=>S.on[t]&&S.tp[t].reached).length} topic${TOPICS.filter(t=>S.on[t]&&S.tp[t].reached).length===1?"":"s"} at your goal</span></div></div>
    </div>
    <div class="quests"><h3>Today’s quests</h3>${S.day.quests.map(q=>{const [n,t,r]=QUESTS[q.id];return `<div class="qrow ${q.done?"done":""}"><span class="qtick">${q.done?"✓":""}</span><div class="qtxt"><span>${n}</span><div class="meter"><i style="width:${q.p/t*100}%"></i></div></div><span class="qr">+${r} J</span></div>`;}).join("")}</div>
    ${S.chests?`<button class="btn wide chestbtn" id="chest">🎁 Open mystery box${S.chests>1?` (${S.chests})`:""}</button>`:`<p class="soft small">🎁 Mystery box in ${Math.max(1,8-(S.chestProg||0))} more right answers</p>`}
@@ -2558,7 +2567,6 @@ function openChest(){
   const notOwned=STICKERS.filter(([e])=>!S.owned["st:"+e]);const r=Math.random();let prize,apply;
   if(r<.2&&notOwned.length){const [e,n]=pick(notOwned);prize=`<div class="prize">${e}</div><p><b>${n} sticker</b></p>`;apply=()=>{S.owned["st:"+e]=1;if(S.eq.stickers.length<8)S.eq.stickers.push(e);};}
   else if(r<.38){prize=`<div class="prize">✖️2</div><p><b>Double joules for 5 answers</b></p>`;apply=()=>{S.boost=(S.boost||0)+5;};}
-  else if(r<.48){prize=`<div class="prize">🧊</div><p><b>Streak freeze</b></p><p class="soft small">Protects your streak if you miss a day.</p>`;apply=()=>{S.freezes=Math.min(2,(S.freezes||0)+1);};}
   else{const j=pick([30,40,50,60,75,100]);prize=`<div class="prize">⚡</div><p><b>${j} joules</b></p>`;apply=()=>award(j,{raw:true});}
   screen(`${slim("")}<div class="center col" style="padding-top:8vh"><p class="tag">Mystery box</p><div class="box" id="box">🎁</div><div id="reveal" hidden>${prize}</div>
    <button class="btn primary wide" id="back" hidden>Back</button></div>`);
@@ -6107,6 +6115,52 @@ bank({id:"sy.earth3",topic:"space",lvl:3.3,type:"idea",big:["space"],note:"syE3"
  Q("Acid rain wears away a statue. This is…","chemical weathering",[["biological weathering","general"],["physical weathering","general"]],"Acid reacts with the rock."),
  Q("A climber says the rocks never change. Why does she not notice weathering?","it happens very slowly",[["it only happens at night","general"],["rocks cannot be weathered","general"]],"It takes many years.")]);
 
+/* ============ exam words: a planned route from simple wording to SQA command words ============ */
+const CMDW={State:"give a short answer. No reason needed.",Name:"give the name only.",Identify:"pick it out.",Describe:"say what happens.",
+  Explain:"say why. Use “because”.",Suggest:"give a sensible idea using what you know.",Predict:"say what will happen.",
+  Justify:"give the reason for your answer.",Calculate:"formula, then the numbers, then the answer and unit.",Determine:"work it out.",Estimate:"give a sensible rough value."};
+const CW_RE=/(^|>|[.?!]\s+)(State|Name|Identify|Describe|Explain|Suggest|Predict|Justify|Calculate|Determine|Estimate)\b/g;
+const NOJ=["general","Good start. “Justify” means you must give the reason too."],NOA=["general","Give your answer first, then the reason."];
+bank({id:"cw3.ee",topic:"power",lvl:3.4,type:"idea",big:["evidence"],note:"po3a"},[
+ Q("A question says “State…”. What should you write?","a short answer. No reason needed.",[["a long story","general"],["a drawing","general"]],"State = a short answer."),
+ Q("A question says “Explain…”. What should you write?","say why, using “because”",[["just one word","general","Explain needs a reason."],["a number","general"]],"Explain = say why."),
+ Q("A question says “Describe…”. What should you write?","say what happens",[["only a number","general"],["draw a graph","general"]],"Describe = say what happens."),
+ Q("A question says “Calculate…”. What should you write?","formula, numbers, answer and unit",[["just the answer","general","Show the formula and the numbers too."],["a sentence about the topic","general"]],"Show all three steps."),
+ Q("Which is the best answer to: “Explain why a kettle wastes some energy.”","Some heat escapes into the air because the kettle gets warm.",[["The kettle.","general","That does not say why."],["2000 W.","general"]],"It says why, using “because”."),
+ Q("Which is the best answer to: “State one renewable energy source.”","Wind.",[["Wind, because the air moves and turns a turbine, and it will never run out, so it is good.","general","That is right, but State only needs a short answer."],["Coal.","renewable-mixup"]],"State = short. One word can be enough.")]);
+bank({id:"cw4.ee",topic:"circuits",lvl:4.3,type:"idea",big:["electricity","evidence"],note:"ci4b"},[
+ Q("A lamp and a variable resistor are in series. The resistance is decreased. State the effect on the lamp. Justify your answer.","The lamp gets brighter, because the current increases.",[["The lamp gets brighter.",...NOJ],["Because the current increases.",...NOA]],"Answer, then reason."),
+ Q("A balloon is put on a warm radiator. State what happens to its volume. Justify your answer.","It increases, because the particles move faster and hit the walls harder.",[["It increases.",...NOJ],["It decreases, because the particles slow down.","general"]],"Answer, then reason."),
+ Q("Explain why electromagnets are used in scrapyards instead of normal magnets.","They can be switched off, so the metal can be dropped.",[["They are magnets.","general","That does not say why."],["They are cheaper.","general"]],"Explain = say why."),
+ Q("Suggest why a house with solar panels is also connected to the National Grid.","Solar panels make no electricity at night.",[["Solar panels are blue.","general"],["The grid is renewable.","general"]],"Suggest = a sensible idea from what you know."),
+ Q("Washing machine A is rated A++ and B is rated C. State which has lower running costs. Justify your answer.","A, because it wastes less energy.",[["A.",...NOJ],["B, because C is a better grade.","general"]],"Answer, then reason."),
+ Q("Heat moves from a hot spoon handle to your hand. Name the type of heat transfer.","Conduction.",[["Conduction, because the particles in the metal vibrate and pass on the energy from one to the next until it reaches your hand.","general","Correct, but Name only needs the name."],["Convection.","general"]],"Name = just the name.")]);
+bank({id:"cw3.wr",topic:"waves",lvl:3.4,type:"idea",big:["evidence"],note:"wa3a"},[
+ Q("A question says “Predict…”. What should you write?","say what will happen",[["say what happened yesterday","general"],["just copy the question","general"]],"Predict = what will happen."),
+ Q("A question says “Suggest…”. What should you write?","a sensible idea using what you know",[["the exact answer from a book","general"],["nothing","general"]],"There can be more than one good answer."),
+ Q("A question says “Name…”. What should you write?","just the name",[["a full paragraph","general"],["a number","general"]],"Name = the name only."),
+ Q("Which is the best answer to: “Describe what happens to a cork as a wave passes.”","It bobs up and down in the same place.",[["Water.","general","That does not describe what happens."],["Because waves carry energy.","general","That says why, not what happens."]],"Describe = say what happens."),
+ Q("Which is the best answer to: “Explain why you cannot hear sound in space.”","There are no particles in space, so the sound cannot travel.",[["Space is big.","general","That does not say why."],["You cannot hear it.","general","That repeats the question."]],"It says why.")]);
+bank({id:"cw4.wr",topic:"light",lvl:4.3,type:"idea",big:["waves","evidence"],note:"li4a"},[
+ Q("State whether sound waves are transverse or longitudinal. Justify your answer.","Longitudinal, because the particles move back and forth along the direction of the wave.",[["Longitudinal.",...NOJ],["Transverse, because sound is loud.","general"]],"Answer, then reason."),
+ Q("Explain why you see lightning before you hear thunder.","Light travels much faster than sound.",[["Lightning is bright.","general","That does not say why."],["Thunder is loud.","general"]],"Explain = say why."),
+ Q("Paper passes between a radioactive source and a detector. The paper gets thicker. Predict what happens to the reading. Justify your answer.","It goes down, because thicker paper absorbs more radiation.",[["It goes down.",...NOJ],["It goes up, because there is more paper.","general"]],"Answer, then reason."),
+ Q("Describe how an echo is made.","Sound reflects off a hard surface and comes back.",[["Sound gets louder.","general"],["Light bounces off a mirror.","general"]],"Describe = what happens."),
+ Q("Suggest one way to protect workers from loud noise.","Wear ear defenders.",[["Wear sunglasses.","general"],["Turn on the lights.","general"]],"Suggest = a sensible idea."),
+ Q("State one way ultraviolet can harm people.","It can cause skin cancer.",[["It can cause skin cancer, because UV has a lot of energy and it can damage the cells in your skin over many years in the sun.","general","Correct, but State only needs a short answer."],["It breaks bones.","general"]],"State = short.")]);
+bank({id:"cw3.ds",topic:"forces",lvl:3.4,type:"idea",big:["evidence"],note:"fo3a"},[
+ Q("A question says “Justify your answer”. What should you add?","the reason for your answer",[["a picture","general"],["the question again","general"]],"Justify = give the reason."),
+ Q("A question says “Calculate the speed”. What must your answer have?","formula, numbers, answer and unit",[["just the number","general","You lose marks with no unit and no working."],["a reason","general"]],"Show all three steps."),
+ Q("A question says “State…”. How long should your answer be?","short",[["a full page","general"],["at least three sentences","general"]],"State = short."),
+ Q("Which is the best answer to: “Explain why a box slows down when you stop pushing it.”","Friction acts against the movement, so it slows the box down.",[["It stops.","general","That does not say why."],["The box is heavy.","general"]],"It says why.")]);
+bank({id:"cw4.ds",topic:"space",lvl:4.3,type:"idea",big:["forces","evidence"],note:"sy4a"},[
+ Q("A car travels at a steady speed on a flat road. State how the driving force compares with friction. Justify your answer.","They are equal, because the speed is not changing.",[["They are equal.",...NOJ],["Driving force is bigger, because the car is moving.","general"]],"Answer, then reason."),
+ Q("Explain why a ball bounces lower each time.","Some energy is changed to heat and sound each bounce.",[["The ball gets tired.","general"],["Gravity stops.","general"]],"Explain = say why."),
+ Q("A satellite moves to a higher orbit. State what happens to its period.","It gets longer.",[["It gets longer, because higher satellites have further to travel, and they travel more slowly, so each orbit takes more time.","general","Correct, but State only needs a short answer."],["It gets shorter.","general"]],"State = short."),
+ Q("Suggest one way a skier can reduce friction.","Wear tight clothing.",[["Wear a big coat.","general"],["Ski more slowly.","general"]],"Suggest = a sensible idea."),
+ Q("You go to the Moon. State what happens to your weight. Justify your answer.","It gets less, because gravity on the Moon is weaker.",[["It gets less.",...NOJ],["It stays the same, because your mass is the same.","general","Mass stays the same. Weight changes."]],"Answer, then reason."),
+ Q("Describe the motion shown by dots on a ticker tape that get further apart.","The trolley is speeding up.",[["The trolley is stopped.","general"],["The trolley is heavy.","general"]],"Describe = what happens.")]);
+
 /* ============ key words, true or false, fill the gaps, put in order ============ */
 /* terms: [word, meaning, key note]. tf: [true statement, false statement, why, key note]. gap: [text with [gaps], spare words, key note]. order: [question, steps, key note, level].
    A question only comes up once its key note is done, or if it belongs to the first note of that level. */
@@ -7005,7 +7059,7 @@ function present(it,f,focus){
   if(f.spot&&!focus&&r<0.12)return f.spot();
   if(f.typeable&&it.opts&&it.opts.num&&r<0.35){const n=it.opts.num;return {...it,kind:"type",okVal:n.okVal,unit:n.unit,wv:n.wrongs,neg:n.neg,pre:n.pre};}
   /* recall: once a pupil has met this kind of question, some sentence completions become typed answers */
-  if(it.opts&&!it.opts.num&&th>=f.lvl+0.2&&r>0.82){const okO=it.opts.find(o=>o.ok);if(okO&&wordable(it.q,okO.h))return toWord(it,okO.h);}
+  if(it.opts&&!it.opts.num&&th>=f.lvl+0.2&&r>(S.goal>=4&&f.lvl>=4?0.6:0.82)){const okO=it.opts.find(o=>o.ok);if(okO&&wordable(it.q,okO.h))return toWord(it,okO.h);}
   return it;
 }
 function makeItem(f,focus,plain){
@@ -7068,32 +7122,42 @@ function ask(item,meta){
   const tag=meta.ctx==="fixup"?`<p class="tag fix">Fix-up · ${MC[meta.focus]?MC[meta.focus].n:""} (${sess.fix?sess.fix.streak:0} of 3)</p>`:meta.ctx==="test"?`<p class="tag">Your turn</p>`:meta.ctx==="retry"?`<p class="tag">One more like that</p>`
     :meta.ctx==="review"?`<p class="tag">Warm-up · ${sess.warmN-sess.warm.length} of ${sess.warmN}${meta.why==="lock"?" · lock-in":""}</p>`:item.think?`<p class="tag think">Think deeper</p>`:item.lab?`<p class="tag">${item.lab}</p>`:"";
   screen(`${top}${tag}<div id="qbox"></div>`);
-  renderItem(document.getElementById("qbox"),{...item,try2:true},res=>answered(res));
+  const box=document.getElementById("qbox"),kd=item.kind||"mc";const prac=meta.ctx==="own"||meta.ctx==="delayed";
+  const cs={t0:Date.now(),ask:S.a11y.conf!==false&&kd==="mc"&&prac&&((sess.cq=(sess.cq||0)+1)%3===0)};cur.cs=cs;confWire(box,cs);
+  renderItem(box,{...item,try2:true},res=>answered({...res,conf:cs.chosen||null,dt:(cs.t1||Date.now())-cs.t0}));
+  if(sess.slow>0&&["mc","tap","sort"].includes(kd)){sess.slow--;readFirst(box);cs.t0=Date.now()+3000;}
 }
 function tagHit(tag,t){const g=S.tags[tag]||(S.tags[tag]={count:0,topic:t,cleared:false,fixes:0});g.count++;g.topic=t;g.cleared=false;g.last=Date.now();}
 function answered(res){
   if(cur.done)return;cur.done=true;const {item,meta}=cur;const f=FAM[meta.fam];const t=f.topic;const b=sess.block;
+  {const kd=item.kind||"mc";const quick=["mc","tap","sort"].includes(kd)&&res.dt!=null&&res.dt<2000&&!res.conf;res.fast=quick;
+   if(meta.ctx!=="review"){sess.fastRun=quick?(sess.fastRun||0)+1:0;if(sess.fastRun>=3){sess.fastRun=0;sess.slow=3;setTimeout(()=>toast("📖 Slow down and read each question. It helps you remember.",0,{info:true}),300);}}
+   if(res.conf){S.conf=S.conf||{sr:0,sw:0,gr:0,gw:0};S.conf[(res.conf==="sure"?"s":"g")+(res.ok?"r":"w")]++;}}
   const prevFade=item.fadeKey?fadeLvl(item.fadeKey):null;
   if(item.fadeKey)S.fade[item.fadeKey]=res.ok?fadeLvl(item.fadeKey)+1:Math.max(0,fadeLvl(item.fadeKey)-1);
   if(item.fadeKey&&!res.ok&&prevFade===0&&f.type==="calc")S.we[f.id]=0; /* still struggling at the first stage: show the worked example again next time */
   const moves=meta.ctx==="own"||meta.ctx==="delayed"||(meta.ctx==="review"&&!meta.gapNote);
   /* typed and built answers tell us more than a choice from three, so they move the level estimate more */
   const k=item.kind||"mc";const wt=k==="write"?0.5:res.override?0.5:(res.fallback||["mc","tap","sort","order"].includes(k))?0.7:1.1;
-  record(item,f,res.ok,{theta:moves,weight:wt,lh:meta.ctx!=="fixup"&&meta.ctx!=="retry"&&!meta.gapNote,mem:moves});
+  record(item,f,res.ok,{theta:moves,weight:wt*(res.ok&&(res.conf==="guess"||res.fast)?0.5:1),lh:meta.ctx!=="fixup"&&meta.ctx!=="retry"&&!meta.gapNote,mem:moves});
+  if(res.ok&&res.conf==="guess"&&moves)sess.delayed.push({fam:meta.fam,focus:meta.focus,wait:3});
+  if(!res.ok&&res.conf==="sure"){const tg=res.tag&&res.tag!=="general"?res.tag:null;if(tg){const g=S.tags[tg]||(S.tags[tg]={count:0,topic:t,cleared:false,fixes:0});g.sure=(g.sure||0)+1;}if(moves)sess.delayed.push({fam:meta.fam,focus:tg,wait:3});}
   if(meta.ctx==="review"&&res.ok)sess.warmRight++;
   sess.asked++;if(b&&b.t===t&&(meta.ctx==="own"||meta.ctx==="delayed")){b.asked++;if(res.ok)b.right++;}
   const ev=moves?milestones(t):[];
   if(res.second){S.run=0;const tag=res.tag||"general";if(tag!=="general")tagHit(tag,t);sess.tagHits[tag]=(sess.tagHits[tag]||0)+1;if(meta.ctx==="fixup"&&sess.fix)sess.fix.streak=0;
-    const g2=award(4,{raw:true,quiet:true});if(b)b.j=(b.j||0)+g2;S.t2=(S.t2||0)+1;badge("try2");if(S.t2>=10)badge("try2x10");
+    const g2=0;if(b)b.j=(b.j||0)+g2;S.t2=(S.t2||0)+1;badge("try2");if(S.t2>=10)badge("try2x10");
     const again=meta.ctx!=="retry"&&meta.ctx!=="fixup"&&meta.ctx!=="review";sess.pending=again?[{type:"retry",fam:meta.fam,focus:tag!=="general"&&f.tags.includes(tag)?tag:null}]:[];save();
-    sheet("good","Got it on try 2!"+(focusOn()?"":` <span class="jgain">+${g2} J</span>`),(item.model||"")+(again?`<p>One more like this to lock it in.</p>`:""),"Next",next,0);return;}
+    sheet("good","Got it on try 2!",(item.model||"")+(again?`<p>One more like this to lock it in.</p>`:""),"Next",next,0);return;}
   if(res.ok){
     sess.right++;let extra="";S.run=(S.run||0)+1;badge("first");[3,5,10,15,20].forEach(n=>{if(S.run>=n)badge("run"+n);});S.rt=(S.rt||0)+1;[10,25,50,100,250,500].forEach(n=>{if(S.rt>=n)badge("right"+n);});let got=0;if(item.kw){S.kwn=(S.kwn||0)+1;if(S.kwn>=20)badge("words20");if(S.kwn>=60)badge("words60");}
     if(meta.ctx==="retry"||meta.ctx==="test"){got+=award(5,{raw:true,quiet:true});S.bb=(S.bb||0)+1;badge("bounce1");if(S.bb>=10)badge("bounce10");quest("bounce2");extra="You fixed it! +5 J bonus.";}
     if(meta.ctx==="test"){sess.delayed.push({fam:meta.fam,focus:meta.focus,wait:2});}
     if(meta.ctx==="fixup"){sess.fix.streak++;if(sess.fix.streak>=3){const g=S.tags[sess.fix.tag];if(g){g.cleared=true;g.fixes++;}extra="Fix-up done!";sess.fix=null;award(30);badge("fix1");}else extra=`${sess.fix.streak} of 3 in a row.`;}
     const chest=countCorrect();quest("right10");quest("right20");rollDay();S.day.tr=S.day.tr||[];if(!S.day.tr.includes(t)){S.day.tr.push(t);quest("mix3");}if(S.run>=5)quest("combo5");if(item.explain||item.kind==="write")quest("think3");
-    got+=award(Math.round(10+3*Math.max(0,(item.lvl||3)-3)),{practice:true,quiet:true});if(b)b.j=(b.j||0)+got;
+    got+=award(Math.round((10+3*Math.max(0,(item.lvl||3)-3))*(res.fast||res.conf==="guess"?0.5:1)),{practice:true,quiet:true});if(b)b.j=(b.j||0)+got;
+    if(res.conf==="guess")extra=(extra?extra+" ":"")+"You guessed, but you got it! It will come back later to check you know it.";
+    if(res.conf==="sure")extra=(extra?extra+" ":"")+"Sure and right. 👍";
     save();
     const lines=extra?`<p>${extra}</p>`:"";
     const big=ev.find(e=>e.type!=="slip");
@@ -7269,9 +7333,10 @@ function afterWatch(id,o){const st=nst(id);return (st.lab||!NOTE[id].lab)?noteSu
 function labStage(id,o){
   const n=NOTE[id],L=n.lab,st=nst(id);
   if(L.pred&&st.pred==null&&!st.lab)return predictStage(id,o);
-  const pc=L.pred&&st.pred!=null&&!st.lab?`<div class="predcard"><span class="notelab">Your prediction</span><p>${predStem(L.pred)} <b>${st.predH}</b></p></div>`:"";
+  const pc=L.pred&&!L.pred.fromC&&st.pred!=null&&!st.lab?`<div class="predcard"><span class="notelab">Your prediction</span><p>${predStem(L.pred)} <b>${st.predH}</b></p></div>`:"";
+  const yt=L.pred&&L.pred.fromC&&st.pred!=null&&st.predH?`<p class="youthink">You think: <b>${st.predH}</b></p>`:"";
   screen(`${noteTop(n,n.ch.length)}<p class="tag">${n.title} · try it</p>${pc}
-   ${L.q?`<div class="findq"><span class="fq-l">🔎 Find out</span><p>${L.q}</p></div>`:""}
+   ${L.q?`<div class="findq"><span class="fq-l">🔎 Find out</span><p>${L.q}</p>${yt}</div>`:""}
    <div class="labcard"><span class="notelab trylab">Try it</span><p class="small">${L.p}</p>${!L.q&&L.tasks?`<ul class="tasks">${L.tasks.map(x=>`<li>${x}</li>`).join("")}</ul>`:""}<div id="labArea">${L.h}</div></div>
    <button class="btn primary wide" id="lq" ${st.lab?"":"disabled"}>${st.lab?"Back to the key note":"Try the experiment first"}</button>`);
   const area=document.getElementById("labArea"),b=document.getElementById("lq");initLabs(area);
@@ -7286,17 +7351,18 @@ function labStage(id,o){
 const predStem=P=>{const s=P.q.replace(/^Predict:\s*/,"");return s.charAt(0).toUpperCase()+s.slice(1);};
 function predictStage(id,o){
   const n=NOTE[id],P=n.lab.pred,st=nst(id);const opts=mc(P.ok,P.no.map(x=>w(x,"general")));
-  screen(`${noteTop(n,n.ch.length)}<p class="tag">${n.title} · try it</p><p class="checklab">Before you start: predict</p><div class="prompt">${predStem(P)}</div>${optButtons(opts)}
+  screen(P.fromC?`${noteTop(n,n.ch.length)}<p class="tag">${n.title} · try it</p><div class="findq"><span class="fq-l">🔎 Find out</span><p>${P.q}</p></div><p class="checklab">What do you think? Tap one.</p>${optButtons(opts)}
+   <p class="soft small">No marks for this. It is fine to guess. Then try the experiment to find out.</p>`:`${noteTop(n,n.ch.length)}<p class="tag">${n.title} · try it</p><p class="checklab">Before you start: predict</p><div class="prompt">${predStem(P)}</div>${optButtons(opts)}
    <p class="soft small">There’s no mark for this. Just say what you think will happen, then test it.</p>`);
   main.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{const o_=opts[+b.dataset.i];st.pred=o_.ok?1:0;st.predH=o_.h;save();labStage(id,o);});
 }
 function compareStage(id,o){
   const n=NOTE[id],P=n.lab.pred,st=nst(id);st.cmp=1;save();
   screen(`${noteTop(n,n.ch.length)}<p class="tag">${n.title} · what happened?</p>
-   <div class="notecard"><span class="notelab">Compare</span><p>${predStem(P)}</p><p>You predicted: <b>${st.predH}</b><br>What happened: <b>${P.ok}</b></p>
+   <div class="notecard"><span class="notelab">Compare</span><p>${predStem(P)}</p><p>You predicted: <b>${st.predH}</b><br>What happened: <b>${P.ok}</b> ${st.pred?"✅":""}</p>
    <p>${st.pred?"Your prediction matched. ":"What happened was different from your prediction. That’s useful: it shows exactly what to rethink. "}${P.why||""}</p></div>
    <button class="btn primary wide" id="go">Answer the questions</button>`);
-  const g=document.getElementById("go");g.onclick=()=>noteChecks(id,"lab",o);g.focus({preventScroll:true});
+  const g=document.getElementById("go");g.onclick=()=>noteChecks(id,"lab",o,P.fromC?1:0);g.focus({preventScroll:true});
 }
 function noteSummary(id,o){
   const n=NOTE[id],st=nst(id);const sm=!!o.study;const all=watchedAll(id)&&(st.lab||!n.lab);
@@ -7539,9 +7605,9 @@ function offerRestore(b){if(!document.querySelector(".onb"))return;
 function pupilSummary(){
   const tp={};TOPICS.forEach(t=>{const p=S.tp[t];if(!p.n)return;tp[t]={lv:workLevel(t),th:+p.th.toFixed(2),sec:secureLevel(t),r:p.reached?1:0,n:p.n,id:conceptAcc(t),ca:mathsAcc(t),f:atFoundations(t)?1:0,lock:p.pend&&!p.reached?1:0};});
   const big={};BIGS.forEach(g=>{const s=bigStrength(g);if(s!=null)big[g]={s,gap:bigFoundGap(g)?1:0};});
-  const tags=Object.entries(S.tags).filter(([g,v])=>MC[g]&&g!=="general"&&!v.cleared).sort((a,b)=>b[1].count-a[1].count).slice(0,6).map(([g,v])=>[g,v.count,v.topic||""]);
+  const tags=Object.entries(S.tags).filter(([g,v])=>MC[g]&&g!=="general"&&!v.cleared).sort((a,b)=>b[1].count-a[1].count).slice(0,6).map(([g,v])=>[g,v.count,v.topic||"",v.sure?1:0]);
   return {v:1,name:S.name||"",cls:S.cls||"",goal:S.goal,start:S.start,ans:S.answered,rec:runAvg(),last:NOW(),tp,big,tags,stu:S.studied||0,skip:S.skipped||0,nb:(S.nb||[]).length,
-    due:Object.values(S.mem||{}).filter(m=>m.ok>0&&m.due<=NOW()).length,mt:S.mt&&S.mt.cnt?{best:S.mt.best,last:S.mt.last,cnt:S.mt.cnt,n:MT_N}:null};}
+    due:Object.values(S.mem||{}).filter(m=>m.ok>0&&m.due<=NOW()).length,conf:S.conf||null,mt:S.mt&&S.mt.cnt?{best:S.mt.best,last:S.mt.last,cnt:S.mt.cnt,n:MT_N}:null};}
 async function cloudSync(force){
   if(CLOUD.state!=="on")return;if(CLOUD.busy){CLOUD.again=true;return;}CLOUD.busy=true;
   try{const sum=pupilSummary();const js=JSON.stringify({...sum,last:0});
@@ -7587,11 +7653,12 @@ async function drawTeacher(){
   box.innerHTML=fracify(`
    <p class="soft">${live?"Live: pupils who open this app signed in, with a class code, appear here as they work.":"Paste pupils’ progress codes below. When this app is opened signed in on claude.ai by its owner, pupils with a class code appear here automatically."}</p>
    <div class="panel row-b"><label class="q" for="tcls">Class</label><select id="tcls"><option value="">All classes (${all.length})</option>${classes.map(c=>`<option value="${esc(c)}" ${c===TEACH.cls?"selected":""}>${esc(c)} (${all.filter(r=>(r.cls||"(no class)")===c).length})</option>`).join("")}</select></div>
-   ${live?`<div class="panel"><label class="setrow"><input type="checkbox" role="switch" class="swi" id="cfocus" ${CLASSCFG.focus?"checked":""}><span><b>Focus mode for everyone</b><span class="soft small">Hides joules, streaks, quests, mystery boxes and the shop on every pupil’s app</span></span></label></div>`:""}
+   ${live?`<div class="panel"><label class="setrow"><input type="checkbox" role="switch" class="swi" id="cfocus" ${CLASSCFG.focus?"checked":""}><span><b>Focus mode for everyone</b><span class="soft small">Hides joules, quests, mystery boxes and the shop on every pupil’s app</span></span></label></div>`:""}
    ${rows.length?`<div class="tstats"><div><b>${rows.length}</b><span>pupils</span></div><div class="${found.length?"warnstat":""}"><b>${found.length}</b><span>at Foundations in a topic</span></div><div><b>${rows.filter(r=>r.rec!=null&&r.rec<0.6).length}</b><span>finding it hard right now</span></div><div><b>${rows.filter(r=>(NOW()-(r.last||0))>7*DAY).length}</b><span>not active this week</span></div></div>
    <div class="panel"><h3>Pupils · most in need first</h3><div class="tscroll"><table class="t track tdash"><tr><th>Pupil</th>${TOPICS.map(t=>`<th title="${TOPIC[t].t}">${TIC[TOPIC[t].ic]}</th>`).join("")}<th>Recent</th><th title="Mini test: last (best)">📝</th><th>Active</th></tr>
     ${rows.map((r,i)=>`<tr class="trow" data-i="${i}"><td><b>${nm(r)}</b>${r.cls&&!TEACH.cls?` <span class="soft small">${esc(r.cls)}</span>`:""}${Object.values(r.tp||{}).some(x=>x.f)?` <span class="lvchip found">F</span>`:""}</td>${TOPICS.map(t=>`<td>${chip((r.tp||{})[t],t)}</td>`).join("")}<td class="num">${r.rec!=null?Math.round(r.rec*100)+"%":"–"}</td><td class="num small">${r.mt?`${r.mt.last}/${r.mt.n||8} <span class="soft">(${r.mt.best})</span>`:"–"}</td><td class="small">${ago(r.last)}</td></tr>`).join("")}</table></div>
     <p class="soft small">F = Foundations (below N3). ✓ = goal reached. ⧗ = goal met once, waiting for a check on another day. Tap a pupil for details.</p></div>
+   ${classMisc(rows)}
    <div id="tdetail"></div>
    ${found.length?`<div class="panel foundp"><h3>🧱 Foundations</h3><ul class="advice">${TOPICS.map(t=>{const p=rows.filter(r=>r.tp&&r.tp[t]&&r.tp[t].f);return p.length?`<li><b>${TOPIC[t].t}:</b> ${p.map(nm).join(", ")}</li>`:"";}).join("")}</ul><p class="soft small">These pupils need the basics first: everyday examples, a demonstration and a short check-in before N3 work.</p></div>`:""}
    <div class="panel"><h3>Big ideas across the class</h3>${bigAgg.map(x=>`<div class="srow2"><div class="stop"><span><b>${BIG[x.g].s}</b>${x.gaps?` <span class="foundtag inl">${x.gaps} with a Foundations gap</span>`:""}</span><b>${x.avg}%</b></div><div class="meter sm ${x.avg>=80?"strong":x.avg>=60?"mid":"weak"}"><i style="width:${Math.max(4,x.avg)}%"></i></div>${x.avg<65?`<p class="small tip">💡 ${BIG[x.g].teach}</p>`:""}</div>`).join("")}</div>
@@ -7683,7 +7750,7 @@ function readAloud(){
 function renderItem(box,it,cb){
   if(it.kind==="word"&&it.choices&&!S.a11y.type)it={...it,kind:"mc",opts:it.choices,q:String(it.q).replace("Type the unit of","Pick the unit of")};
   const kind=it.kind||"mc";let h="";
-  if(it.q)h+=`<div class="${kind==="tap"&&!it.spot?"q":"prompt"}">${it.q}</div>`;
+  if(it.q)h+=`<div class="qrow">${S.a11y.voice!==false?`<button class="qsay" type="button" aria-label="Read the question aloud">🔊</button>`:""}<div class="${kind==="tap"&&!it.spot?"q":"prompt"}">${cmdMark(it.q)}</div></div>${kind==="tap"?"":cmdHelp(it)}`;
   if(kind!=="tap"&&it.fig)h+=`<div class="fig">${it.fig}</div>`;
   if(kind==="mc")h+=optButtons(it.opts);
   if(kind==="tap")h+=`<p class="hint">${IC.hand} Tap your answer</p><div class="tapzone ${it.svg?"svgzone fig":"sentence"}">${it.tapHTML}</div>`;
@@ -7692,7 +7759,7 @@ function renderItem(box,it,cb){
   if(kind==="gap"){it._w=shuffle([...it.ans,...it.extra]);h+=`<p class="gaptext">${it.parts.map((p,i)=>i%2?`<button class="slot" data-s="${(i-1)/2}">&nbsp;</button>`:p).join("")}</p><div class="wbank">${it._w.map((x,i)=>`<button class="wchip" data-w="${i}">${x}</button>`).join("")}</div><div id="gfb"></div><button class="btn primary wide" id="check" disabled>Check</button>`;}
   if(kind==="word")h+=`<div class="typebox wordbox"><input type="text" id="wans" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Your answer" placeholder="Type your answer"></div><button class="btn primary wide" id="check">Check</button>${it.choices?`<button class="link stuck" id="showch">I’m stuck: show me choices</button>`:""}<div id="wfb"></div>`;
   if(kind==="type")h+=`<div class="typebox">${it.pre?`<span class="mono">${it.pre}</span>`:""}<input type="text" inputmode="decimal" id="tans" autocomplete="off" aria-label="Your answer"><span class="mono">${it.unit||""}</span></div><button class="btn primary wide" id="check">Check</button>`;
-  box.innerHTML=fracify(h);initLabs(box);let done=false;const fin=r=>{if(done)return;done=true;cb(r);};
+  box.innerHTML=fracify(h);initLabs(box);wireSay(box);let done=false;const fin=r=>{if(done)return;done=true;cb(r);};
   if(kind==="build")return renderBuild(box,it,fin);
   if(kind==="write")return renderWrite(box,it,fin);
   if(kind==="exam"){const keys=it.units&&it.units.length?[...new Set([it.unitKey,...it.units])].sort((a,b)=>Object.keys(UNITS).indexOf(a)-Object.keys(UNITS).indexOf(b)):Object.keys(UNITS);
@@ -7754,8 +7821,11 @@ function wrongBody(it,res,short){
     const tagFb=res.tag&&res.tag!=="general"&&MC[res.tag]?MC[res.tag].fb:"";const isCalc=!!(it.calc||it.kind==="exam"||it.kind==="type"||it.spot);
     const hint=it.nudge?`<p class="nudge"><b>Think about:</b> ${it.nudge}</p>`:isCalc?`<p class="nudge">💡 ${KN.calc}</p>`:res.why?`<p class="nudge">💡 ${res.why}</p>`:tagFb?`<p class="nudge">💡 ${tagFb}</p>`:isCalc?`<p class="nudge">💡 ${KN.calc}</p>`:"";
     const where=res.where&&(it.explain||it.kind==="build")?`<p>Look again at <b>${res.where}</b>.</p>`:"";
-    const model=it.model||it.tip||"";const more=(res.ans&&!/<div|<p/.test(res.ans)?`<p>Answer: <b>${res.ans}</b></p>`:"")+(model?`<div class="model">${model}</div>`:"");
-    return `${where}${hint}${more?`<details class="seeans"><summary>See the answer</summary>${more}</details>`:""}`;}
+    const model=it.model||it.tip||"";const corr=res.ans&&!/<div|<p/.test(res.ans)?res.ans:(it.opts&&(it.opts.find(o=>o.ok)||{}).h)||"";
+    const sure=res.conf==="sure"?`<p class="confnote">You were sure about this one, so it is worth fixing. It will come back soon.</p>`:"";
+    if(isCalc)return `${sure}${where}${corr?`<p class="ansline"><b>Answer:</b> ${corr}</p>`:""}${model?`<div class="model">${model}</div>`:hint}`;
+    const why=oneLine(model)||oneLine(res.why)||oneLine(tagFb);
+    return `${sure}${where}${corr?`<p class="ansline"><b>Answer:</b> ${corr}</p>`:""}${why&&norm(why)!==norm(corr)?`<p class="because">${why}</p>`:hint}`;}
   const fb=(MC[res.tag]&&MC[res.tag].fb)||MC.general.fb;
   if(it.kind==="write")return `<p class="eyebrowish">Model answer</p><div class="modelans">${it.model}</div><p class="soft small">You matched ${res.pts||0} of the ${it.need} marking points needed. Read the model answer, then try writing it in your own words next time.</p>`;
   if(it.explain)return `<p>Your first mistake was in <b>${res.where}</b>.</p><p>${fb}</p>${it.model}`;
@@ -7794,11 +7864,12 @@ function readingOptions(){
    <label class="setrow"><input type="checkbox" role="switch" class="swi" id="o_big" ${A.big?"checked":""}><span><b>Bigger text</b><span class="soft small">Makes everything a bit larger</span></span></label>
    <label class="setrow"><input type="checkbox" role="switch" class="swi" id="o_voice" ${A.voice?"checked":""}><span><b>Read-aloud button</b><span class="soft small">Highlight words, then press 🔊 to hear them</span></span></label>
    <label class="setrow"><input type="checkbox" role="switch" class="swi" id="o_narr" ${A.narr!==false?"checked":""}><span><b>Read key notes aloud</b><span class="soft small">A voice explains each part of a key note</span></span></label>
+   <label class="setrow"><input type="checkbox" role="switch" class="swi" id="o_conf" ${A.conf!==false?"checked":""}><span><b>Ask how sure I am</b><span class="soft small">Sometimes asks “Sure or guessing?” after you pick an answer</span></span></label>
    <label class="setrow"><input type="checkbox" role="switch" class="swi" id="o_type" ${A.type?"checked":""}><span><b>Type some answers</b><span class="soft small">Harder. When this is off, you always pick from choices</span></span></label>`;
 }
 function wireReading(rerender){
   const A=S.a11y;
-  [["o_dys","dys"],["o_big","big"],["o_voice","voice"],["o_narr","narr"],["o_type","type"]].forEach(([id,k])=>{const el=document.getElementById(id);if(el)el.onchange=()=>{A[k]=el.checked;save();applyA11y();};});
+  [["o_dys","dys"],["o_big","big"],["o_voice","voice"],["o_narr","narr"],["o_conf","conf"],["o_type","type"]].forEach(([id,k])=>{const el=document.getElementById(id);if(el)el.onchange=()=>{A[k]=el.checked;save();applyA11y();};});
   main.querySelectorAll(".tint").forEach(b=>b.onclick=()=>{A.tint=b.dataset.tint;save();applyA11y();main.querySelectorAll(".tint").forEach(x=>{x.classList.toggle("on",x===b);x.setAttribute("aria-pressed",x===b);});});
 }
 
@@ -7930,6 +8001,7 @@ function renderTrack(){
    ${(()=>{const fd=TOPICS.filter(t=>S.on[t]&&atFoundations(t));return fd.length?`<div class="panel foundp"><h3>🧱 Foundations</h3><p>Working on the basics in <b>${fd.map(t=>TOPIC[t].t).join(", ")}</b>.</p><p class="soft small">Foundations is the level below N3. It covers the very basics: what matter is made of, solids, liquids and gases, pushes and pulls, hot and cold, energy in everyday life, and measuring with the right units. Teachers: these topics need targeted support.</p></div>`:"";})()}
    <div class="panel"><h3>Topics</h3><div class="tscroll"><table class="t track"><tr><th>Topic</th><th>Level</th><th class="tw">Towards N${S.goal}</th><th>Ideas</th><th>Calcs</th><th></th></tr>${rows}</table></div>
     <p class="soft small">Level is the level you are working at now. Foundations is the level below N3. Secure means you get that level right again and again. Ideas and Calcs are your recent success.</p></div>
+   ${icanPanel()}
    ${mtPanel()}
    <div class="panel"><h3>Big ideas</h3><p class="soft small">These ideas run through many topics. Being good at heat but weak whenever particles come up is a sign to go back to the particle model.</p>${BIGS.map(g=>bigRow(g)).join("")}</div>
    <div class="panel"><h3>What to work on</h3><ul class="advice">${adviceList().map(x=>`<li>${x}</li>`).join("")}</ul></div>
@@ -7984,10 +8056,10 @@ function renderSettings(){
 /* ============ focus mode (for teachers) ============ */
 const cleanCls=s=>String(s||"").toUpperCase().replace(/[^A-Z0-9-]/g,"").slice(0,16);
 function focusPanel(){
-  if(typeof CLASSCFG!=="undefined"&&CLASSCFG&&CLASSCFG.focus)return `<h3>Focus mode</h3><p class="small">Your teacher has turned on focus mode for your class: no joules, streaks, quests, mystery boxes or shop.</p>`;
-  if(S.focus)return `<h3>Focus mode is on</h3><p class="soft small">Joules, streaks, quests, mystery boxes and the shop are hidden. Enter the teacher PIN to turn it off.</p>
+  if(typeof CLASSCFG!=="undefined"&&CLASSCFG&&CLASSCFG.focus)return `<h3>Focus mode</h3><p class="small">Your teacher has turned on focus mode for your class: no joules, quests, mystery boxes or shop.</p>`;
+  if(S.focus)return `<h3>Focus mode is on</h3><p class="soft small">Joules, quests, mystery boxes and the shop are hidden. Enter the teacher PIN to turn it off.</p>
    <div class="row-g"><input type="password" inputmode="numeric" id="fpin" maxlength="4" placeholder="PIN" aria-label="Teacher PIN" class="pin"><button class="btn small" id="foff">Turn off</button></div><p class="soft small" id="fmsg"></p>`;
-  return `<h3>Focus mode</h3><p class="soft small">For teachers. Hides joules, streaks, quests, mystery boxes and the shop, so the app is only about the physics. Set a 4-digit PIN so pupils can’t switch it back.</p>
+  return `<h3>Focus mode</h3><p class="soft small">For teachers. Hides joules, quests, mystery boxes and the shop, so the app is only about the physics. Set a 4-digit PIN so pupils can’t switch it back.</p>
    <div class="row-g"><input type="password" inputmode="numeric" id="fpin" maxlength="4" placeholder="New PIN" aria-label="New teacher PIN" class="pin"><button class="btn small" id="fon">Turn on</button></div><p class="soft small" id="fmsg"></p>`;}
 function wireFocus(){const p=document.getElementById("fpin"),m=document.getElementById("fmsg");
   const on=document.getElementById("fon"),off=document.getElementById("foff");
@@ -8047,7 +8119,6 @@ function renderShop(msg){
    ${sec(`Stickers for your top bar (${S.eq.stickers.length} of 8)`,STICKERS.map(([e,n,p])=>{const own=S.owned["st:"+e];const on=S.eq.stickers.includes(e);return `<div class="item"><span class="swatch glyph">${e}</span><span>${n}</span>${own?`<button class="btn small" data-st="${e}">${on?"Remove":"Show"}</button>`:`<button class="btn small primary" data-buy="st:${e}" data-p="${p}" ${S.j<p?"disabled":""}>${p} J</button>`}</div>`;}).join(""))}
    ${sec("Titles",TITLES.map(([n,p])=>`<div class="item"><span class="swatch glyph">🏷️</span><span>${n}</span>${btn("title:"+n,p,S.owned["title:"+n],S.eq.title===n)}</div>`).join(""))}
    ${sec("Boosts",`<div class="item"><span class="swatch glyph">✖️2</span><span>Double joules for 10 answers${S.boost?` (${S.boost} left)`:""}</span><button class="btn small primary" data-buy="boost" data-p="240" ${S.j<240?"disabled":""}>240 J</button></div>
-     <div class="item"><span class="swatch glyph">🧊</span><span>Streak freeze: saves your streak if you miss a day (${S.freezes||0} of 2)</span><button class="btn small primary" data-buy="freeze" data-p="300" ${S.j<300||(S.freezes||0)>=2?"disabled":""}>300 J</button></div>
      <div class="item"><span class="swatch glyph">🎉</span><span>Confetti on every correct answer</span>${S.owned.confetti?`<button class="btn small" data-conf="1">${S.confetti?"Turn off":"Turn on"}</button>`:`<button class="btn small primary" data-buy="confetti" data-p="300" ${S.j<300?"disabled":""}>300 J</button>`}</div>`)}
    <div class="panel"><h3>Badges</h3><div class="badges">${Object.entries(BADGES).map(([k,[e,n]])=>`<div class="bdg ${S.badges[k]?"got":""}"><span>${e}</span><small>${n}</small></div>`).join("")}</div></div>`);
   const equip=key=>{const [t,v]=key.split(/:(.+)/);if(t==="theme"){S.eq.theme=v;applyTheme();}if(t==="title")S.eq.title=v;};
@@ -8147,9 +8218,10 @@ const FOCUS={
 };
 (function(){for(const id in FOCUS){const n=NOTE[id],F=FOCUS[id];if(!n||!n.lab)continue;const L=n.lab;
   const m=L.h.match(/data-kind="(\w+)" data-o='([^']*)'/);if(m){const o={...JSON.parse(m[2]),...(F.o||{})};if(F.fix)o.fix=F.fix;L.h=labHTML(m[1],o);}
-  L.q=F.q;L.p=F.how;delete L.pred;L.tasks=null;if(F.hide)L.hide=[].concat(F.hide);
+  L.q=F.q;L.p=F.how;L.tasks=null;if(F.hide)L.hide=[].concat(F.hide);
   let c=(L.c||[]).map(x=>({...x}));if(F.rep)for(const i in F.rep)c[+i]=F.rep[i];if(F.rw)for(const i in F.rw)if(c[+i])c[+i].q=F.rw[i];
-  if(F.ord)c=F.ord.map(i=>c[i]).concat(c.filter((_,i)=>!F.ord.includes(i)));L.c=c;}})();
+  if(F.ord)c=F.ord.map(i=>c[i]).concat(c.filter((_,i)=>!F.ord.includes(i)));L.c=c;
+  const c0=c[0];if(c0&&c0.no&&c0.no.length)L.pred={q:F.q,ok:c0.ok,no:c0.no.map(x=>Array.isArray(x)?x[0]:x),fromC:1};else delete L.pred;}})();
 
 /* ============ mini tests: 8 questions from your units, no hints until the end ============ */
 Object.assign(BADGES,{mt1:["📝","First mini test"],mtpb:["📈","Beat your mini test best"],mt8:["🏆","Full marks in a mini test"]});
@@ -8223,6 +8295,60 @@ function practiseTopic(t){if(!sess){sess=newSess();holdRewards(true);}const b={t
 function mtPanel(){const m=mtState();if(!m.cnt)return `<div class="panel"><h3>📝 Mini tests</h3><p class="soft small">No mini tests yet. Take one from the home page.</p></div>`;
   const h=m.hist.slice(-8);return `<div class="panel"><h3>📝 Mini tests</h3><p>Best: <b>${m.best} out of ${MT_N}</b> · Last: <b>${m.last} out of ${MT_N}</b> · Taken: ${m.cnt}</p>
    <div class="mtbars">${h.map(x=>`<span title="${x.s} out of ${x.n}"><i style="height:${Math.max(6,x.s/x.n*100)}%"></i><b>${x.s}</b></span>`).join("")}</div></div>`;}
+
+/* ============ read the question aloud, command words, confidence, slowing down, I can lists ============ */
+function cmdMark(q){q=String(q||"");if(/class="tk"/.test(q))return q;return q.replace(CW_RE,(m,a,w)=>`${a}<b class="cmdw">${w}</b>`);}
+function cmdHelp(it){const q=String(it.q||"").replace(/<[^>]+>/g," ");const ws=[];let m;const re=new RegExp(CW_RE.source,"g");while((m=re.exec(q)))if(!ws.includes(m[2]))ws.push(m[2]);
+  if(!ws.length)return "";const f=it.fam&&FAM[it.fam];const th=f&&S.tp[f.topic]?S.tp[f.topic].th:3;if(th>=4.6)return ""; /* the help fades away as pupils get stronger */
+  const J=ws.includes("Justify");return `<p class="cmdhelp">${ws.slice(0,2).map(w=>`📝 <b>${w}</b> = ${J&&w!=="Justify"?"give your answer first.":CMDW[w]}`).join("<br>")}</p>`;}
+function wireSay(box){const b=box.querySelector(".qsay");if(!b)return;b.onclick=e=>{e.stopPropagation();e.preventDefault();if(speaking){stopSpeech();b.classList.remove("saying");return;}
+  const p=box.querySelector(".prompt,.q");let t=p?(p.innerText||p.textContent):"";const opts=[...box.querySelectorAll(".opt")];
+  opts.forEach((o,i)=>{const tx=(o.querySelector(".otext")||o).innerText||o.textContent;t+=` . Option ${"ABCDE"[i]}: ${tx.replace(/^[A-E]\s+/,"")}`;});
+  const tf=box.querySelector("#tans,#wans");if(tf)t+=" . Type your answer.";
+  b.classList.add("saying");speak(t,()=>b.classList.remove("saying"));};}
+function oneLine(h){const t=String(h||"").replace(/<br\s*\/?>/g," ").replace(/<[^>]+>/g," ").replace(/&nbsp;/g," ").replace(/\s+/g," ").trim();if(!t)return "";
+  const m=t.match(/^(.{12,150}?[.!?])(\s|$)/);return m?m[1]:t.slice(0,150);}
+/* confidence: tap an answer, then Sure or Guessing */
+function confWire(box,state){
+  box.addEventListener("click",e=>{const o=e.target.closest(".opt");if(!o||o.disabled)return;if(!state.t1)state.t1=Date.now();
+    if(!state.ask||state.bypass||state.chosen)return;e.stopPropagation();e.preventDefault();
+    box.querySelectorAll(".opt").forEach(x=>x.classList.toggle("sel",x===o));state.sel=o;
+    if(!box.querySelector(".confbar")){box.insertAdjacentHTML("beforeend",`<div class="confbar" role="group" aria-label="How sure are you?"><p>How sure are you?</p><div class="confbtns"><button class="btn primary" data-cf="sure">👍 Sure</button><button class="btn" data-cf="guess">🤔 Guessing</button></div></div>`);
+      box.querySelectorAll("[data-cf]").forEach(b=>b.onclick=ev=>{ev.stopPropagation();state.chosen=b.dataset.cf;const bar=box.querySelector(".confbar");if(bar)bar.remove();
+        box.querySelectorAll(".opt").forEach(x=>x.classList.remove("sel"));state.bypass=true;state.sel.click();state.bypass=false;});}},true);}
+/* reading first: if a pupil taps answers very fast three times in a row, the next few questions wait 3 seconds */
+function readFirst(box){
+  const opts=[...box.querySelectorAll(".opt,.tk,.sbtn")];if(!opts.length)return;opts.forEach(o=>o.disabled=true);box.classList.add("rwait");
+  box.insertAdjacentHTML("afterbegin",`<div class="rwaitbar" aria-live="polite">📖 Read the question first… <b>3</b></div>`);const bar=box.querySelector(".rwaitbar");let n=3;
+  const tick=setInterval(()=>{n--;if(!bar.isConnected){clearInterval(tick);return;}if(n<=0){clearInterval(tick);bar.remove();box.classList.remove("rwait");opts.forEach(o=>o.disabled=false);}else bar.querySelector("b").textContent=n;},1000);}
+/* I can… lists: ticked when the key note is done and the pupil is secure at that level */
+const ICAN={ci3a:"make a complete circuit and say why a bulb lights",ci3b:"say how series and parallel circuits are different",ci4a:"measure current and voltage with the right meter",ci4b:"use V = IR",ciD4:"sort inputs and outputs into digital and analogue",ci4c:"explain how an LDR or thermistor controls a circuit",
+ po3a:"name renewable and non-renewable sources, with a good and a bad point",po3b:"say how to save energy at home",po4a:"use E = Pt",po4b:"say how to make an electromagnet stronger",poE4:"work out efficiency as a percentage",po4c:"say how a generator makes electricity",
+ pa3a:"describe particles in solids, liquids and gases",pa3b:"say what heating does to particles",pa4a:"explain gas pressure using particles",pa4b:"say how temperature and volume change gas pressure",pa5a:"use pressure = force ÷ area",
+ he3a:"say how heat and temperature are different",he3b:"name conduction, convection and radiation",he3c:"explain how insulation keeps heat in",he4a:"say why materials heat up at different rates",he4b:"explain the flat part of a heating graph",
+ wa3a:"label a wave and say that waves carry energy",wa3b:"say what frequency means, and transverse or longitudinal",wa4a:"use f = N ÷ t and v = d ÷ t for waves",wa4b:"use v = f λ",
+ so3a:"explain how sound is made and why it needs particles",so3b:"link loudness to amplitude and pitch to frequency",so4a:"use distance = speed × time for echoes",so4b:"describe uses of ultrasound and how to protect hearing",
+ li3a:"explain how we see objects",li3b:"use the law of reflection",li3c:"draw what convex and concave lenses do to light",li3d:"explain why objects look coloured",li4a:"say how fast light travels",li4b:"describe uses of light, like optical fibres",
+ ra3a:"describe uses and dangers of infrared and UV",ra3b:"name the parts of the electromagnetic spectrum",ra4a:"put the spectrum in order of energy",ra4b:"say what stops alpha, beta and gamma",raD4:"match each radiation to its detector",ra4c:"say how to use radiation safely",
+ sp3a:"say what speed means",sp3b:"read a distance-time graph",sp4a:"use v = d ÷ t",sp4b:"explain average and instantaneous speed",
+ ac3a:"describe speeding up and slowing down",ac4a:"use a = change in speed ÷ time",ac4b:"read a speed-time graph",
+ fo3a:"say what forces can do, in newtons",fo3b:"say how friction helps and how to reduce it",fo3c:"say what balanced and unbalanced forces do",fo4a:"use Newton’s first law to explain motion",fo4b:"use W = mg and explain mass and weight",
+ en3a:"name energy stores and transfers",en3b:"explain that energy is never used up",en4a:"say what changes Ep",en4b:"say what changes Ek",
+ sy3a:"name the planets in order",syE3:"describe the Earth’s layers and weathering",sy3b:"explain gravity and weight in space",sy4a:"describe satellites and geostationary orbits",sy4b:"describe stars, galaxies and light years"};
+function icanOk(id){const n=NOTE[id];if(!n)return false;const p=S.tp[n.topic];if(!p)return false;const L=Math.floor(n.lvl);
+  return (noteDone(id)||(p.reached&&S.goal>=L))&&(p.th>=Math.max(3,n.lvl)-0.05||(p.reached&&S.goal>=L));}
+function icanPanel(){const units=COURSE.filter(u=>u.topics.some(t=>S.on[t]));if(!units.length)return "";
+  const all=[];const body=units.map(u=>{const rows=[3,4].map(L=>{const ids=Object.keys(ICAN).filter(id=>NOTE[id]&&u.topics.includes(NOTE[id].topic)&&Math.floor(NOTE[id].lvl)===L);if(!ids.length)return "";
+      const li=ids.map(id=>{const ok=icanOk(id);all.push(ok);return `<li class="${ok?"done":""}"><span class="ick">${ok?"✓":""}</span>I can ${ICAN[id]}.</li>`;}).join("");
+      return `<p class="iclvl">N${L}</p><ul class="ican">${li}</ul>`;}).join("");
+    return `<details class="icunit"><summary><b>${u.t}</b></summary>${rows}</details>`;}).join("");
+  const done=all.filter(Boolean).length;
+  return `<div class="panel"><h3>✅ I can…</h3><p class="soft small">${done} of ${all.length} ticked. Ticks appear when you have learned the key note and keep getting that level right.</p>${body}</div>`;}
+/* teacher: the mistakes most pupils in the class are making */
+function classMisc(rows){const c={};rows.forEach(r=>(r.tags||[]).forEach(([g,n,t,sure])=>{if(!MC[g])return;const x=c[g]||(c[g]={g,p:0,sure:0,t});x.p++;if(sure)x.sure++;}));
+  const top=Object.values(c).sort((a,b)=>b.p-a.p||b.sure-a.sure).slice(0,8);if(!top.length)return "";
+  return `<div class="panel"><h3>🧠 Class misconceptions to reteach</h3><ul class="misc">${top.map(x=>`<li><b>${x.p} pupil${x.p===1?"":"s"}</b>${x.sure?` <span class="surechip">${x.sure} sure</span>`:""} · ${MC[x.g].n}${TOPIC[x.t]?` <span class="soft small">(${TOPIC[x.t].t})</span>`:""}${MC[x.g].x?`<br><span class="soft small">Wrong idea: “${esc(String(MC[x.g].x).replace(/<[^>]+>/g,""))}”</span>`:""}<br><span class="small">Reteach: ${MC[x.g].fb}</span></li>`).join("")}</ul>
+   <p class="soft small">“Sure” means pupils were confident in the wrong idea. These are the most important to reteach in person.</p></div>`;}
 
 /* ============ boot ============ */
 if(typeof document!=="undefined"&&document.getElementById("main")){
