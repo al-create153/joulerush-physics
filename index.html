@@ -8118,8 +8118,8 @@ function renderShop(msg){
    ${sec("Colours",Object.entries(THEMES).map(([k,[n,l,d,p]])=>`<div class="item"><span class="swatch" style="background:${l}"></span><span>${n}</span>${btn("theme:"+k,p,p===0||S.owned["theme:"+k],S.eq.theme===k)}</div>`).join(""))}
    ${sec(`Stickers for your top bar (${S.eq.stickers.length} of 8)`,STICKERS.map(([e,n,p])=>{const own=S.owned["st:"+e];const on=S.eq.stickers.includes(e);return `<div class="item"><span class="swatch glyph">${e}</span><span>${n}</span>${own?`<button class="btn small" data-st="${e}">${on?"Remove":"Show"}</button>`:`<button class="btn small primary" data-buy="st:${e}" data-p="${p}" ${S.j<p?"disabled":""}>${p} J</button>`}</div>`;}).join(""))}
    ${sec("Titles",TITLES.map(([n,p])=>`<div class="item"><span class="swatch glyph">🏷️</span><span>${n}</span>${btn("title:"+n,p,S.owned["title:"+n],S.eq.title===n)}</div>`).join(""))}
-   ${sec("Boosts",`<div class="item"><span class="swatch glyph">✖️2</span><span>Double joules for 10 answers${S.boost?` (${S.boost} left)`:""}</span><button class="btn small primary" data-buy="boost" data-p="240" ${S.j<240?"disabled":""}>240 J</button></div>
-     <div class="item"><span class="swatch glyph">🎉</span><span>Confetti on every correct answer</span>${S.owned.confetti?`<button class="btn small" data-conf="1">${S.confetti?"Turn off":"Turn on"}</button>`:`<button class="btn small primary" data-buy="confetti" data-p="300" ${S.j<300?"disabled":""}>300 J</button>`}</div>`)}
+   ${sec("Boosts",`<div class="item"><span class="swatch glyph">✖️2</span><span>Double joules for 10 answers${S.boost?` (${S.boost} left)`:""}</span><button class="btn small primary" data-buy="boost" data-p="2400" ${S.j<2400?"disabled":""}>2400 J</button></div>
+     <div class="item"><span class="swatch glyph">🎉</span><span>Confetti on every correct answer</span>${S.owned.confetti?`<button class="btn small" data-conf="1">${S.confetti?"Turn off":"Turn on"}</button>`:`<button class="btn small primary" data-buy="confetti" data-p="3000" ${S.j<3000?"disabled":""}>3000 J</button>`}</div>`)}
    <div class="panel"><h3>Badges</h3><div class="badges">${Object.entries(BADGES).map(([k,[e,n]])=>`<div class="bdg ${S.badges[k]?"got":""}"><span>${e}</span><small>${n}</small></div>`).join("")}</div></div>`);
   const equip=key=>{const [t,v]=key.split(/:(.+)/);if(t==="theme"){S.eq.theme=v;applyTheme();}if(t==="title")S.eq.title=v;};
   main.querySelectorAll("[data-buy]").forEach(b=>b.onclick=()=>{const key=b.dataset.buy,p=+b.dataset.p;if(S.j<p)return;S.j-=p;
@@ -8350,6 +8350,8 @@ function classMisc(rows){const c={};rows.forEach(r=>(r.tags||[]).forEach(([g,n,t
   return `<div class="panel"><h3>🧠 Class misconceptions to reteach</h3><ul class="misc">${top.map(x=>`<li><b>${x.p} pupil${x.p===1?"":"s"}</b>${x.sure?` <span class="surechip">${x.sure} sure</span>`:""} · ${MC[x.g].n}${TOPIC[x.t]?` <span class="soft small">(${TOPIC[x.t].t})</span>`:""}${MC[x.g].x?`<br><span class="soft small">Wrong idea: “${esc(String(MC[x.g].x).replace(/<[^>]+>/g,""))}”</span>`:""}<br><span class="small">Reteach: ${MC[x.g].fb}</span></li>`).join("")}</ul>
    <p class="soft small">“Sure” means pupils were confident in the wrong idea. These are the most important to reteach in person.</p></div>`;}
 
+/* shop prices are ten times higher: joules should take real effort to spend */
+const SHOPX=10;Object.values(THEMES).forEach(t=>t[3]*=SHOPX);STICKERS.forEach(x=>x[2]*=SHOPX);TITLES.forEach(x=>x[1]*=SHOPX);
 /* ============ boot ============ */
 if(typeof document!=="undefined"&&document.getElementById("main")){
   load();applyTheme();applyA11y();
