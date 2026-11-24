@@ -2412,7 +2412,7 @@ const BADGES={first:["✔️","First right answer"],run3:["👍","3 right in a r
  perfect1:["✨","A set with no mistakes"],perfect5:["🌠","5 sets with no mistakes"],
  star1:["⭐","First star"],star3:["🌟","3 stars in one day"],star10:["🏵️","10 stars"],
  quest1:["📜","First quest done"],quest10:["🧭","10 quests done"],
- chest1:["🎁","First mystery box"],chest5:["🧰","5 mystery boxes"],shop1:["🛍️","First shop buy"],
+ shop1:["🛍️","First shop buy"],
  back1:["👋","Came back another day"],
  lvlup:["⬆️","First level up"],level5:["🎖️","Level 5"],level10:["🥋","Level 10"],level15:["🦸","Level 15"],
  j250:["🪙","250 J earned"],j1000:["💰","1000 J earned"],j2500:["💎","2500 J earned"],j5000:["🏦","5000 J earned"],
@@ -2510,7 +2510,7 @@ function rollDay(){
   const prev=S.day&&S.day.date;
   /* written and step-by-step questions start at N3, so pupils working at Foundations don’t get those quests */
   const low=TOPICS.filter(t=>S.on[t]).every(t=>S.tp[t].th<3.2);const hasX=FAMS.some(f=>S.on[f.topic]&&f.type==="write");const pool=Object.keys(QUESTS).filter(k=>(!low||(k!=="think3"&&k!=="steps1"))&&(hasX||k!=="think3"));
-  S.day={date:t,earned:0,correct:0,goal:false,tr:[],quests:shuffle(pool).slice(0,3).map(id=>({id,p:0,done:false}))};
+  S.day={date:t,earned:0,correct:0,goal:false,tr:[],quests:(()=>{const pl=pool.slice().sort(),d=Math.floor(Date.now()/864e5);return [0,1,2].map(i=>pl[(d*3+i)%pl.length]).filter((x,i,a)=>a.indexOf(x)===i);})().map(id=>({id,p:0,done:false}))};
   if(prev&&S.earned>0){S.welcome=1;}
   save();
 }
@@ -2518,7 +2518,7 @@ function quest(id,n=1){rollDay();const q=S.day.quests.find(x=>x.id===id);if(!q||
   if(q.p>=QUESTS[id][1]){q.done=true;q.p=QUESTS[id][1];S.qd=(S.qd||0)+1;setTimeout(()=>{toast(`🎯 Quest done: ${QUESTS[id][0]} · +${QUESTS[id][2]} J`,0,{now:true});award(QUESTS[id][2],{raw:true});badge("quest1");if(S.qd>=10)badge("quest10");},400);}}
 function comboMult(){const r=S.run||0;return r>=8?3:r>=5?2:r>=3?1.5:1;}
 /* Rewards are held during a session and paid out at the end of each block, so nothing pops up while pupils are learning.
-   Focus mode (set by a teacher) hides joules, streaks, quests, mystery boxes and the shop altogether. */
+   Focus mode (set by a teacher) hides joules, streaks, quests and the shop altogether. */
 let HOLD=false;const HELD=[];
 const focusOn=()=>!!(S.focus||(typeof CLASSCFG!=="undefined"&&CLASSCFG&&CLASSCFG.focus));
 function holdRewards(on){HOLD=false;if(!on){payout();const h=HELD.splice(0);if(!focusOn())h.slice(-3).forEach(([x,j])=>toast(x,j,{now:true}));}}
@@ -2544,8 +2544,6 @@ function addJ(x,tags=[],quiet){
 function payout(){const x=S.held||0;if(!x)return 0;S.held=0;addJ(x,["from your last block"]);return x;}
 function countCorrect(){
   rollDay();S.day.correct++;
-  S.chestProg=(S.chestProg||0)+1;
-  if(S.chestProg>=8){S.chestProg=0;S.chests=(S.chests||0)+1;return true;}
   return false;
 }
 function streakAlive(){return S.streak.last===todayKey()||S.streak.last===dayOffset(1);}
@@ -2559,10 +2557,10 @@ function todayPanel(){
     <div class="stat"><div class="flame lit">📒</div><div><b>${(S.nb||[]).length} key note${(S.nb||[]).length===1?"":"s"}</b><span>${TOPICS.filter(t=>S.on[t]&&S.tp[t].reached).length} topic${TOPICS.filter(t=>S.on[t]&&S.tp[t].reached).length===1?"":"s"} at your goal</span></div></div>
    </div>
    <div class="quests"><h3>Today’s quests</h3>${S.day.quests.map(q=>{const [n,t,r]=QUESTS[q.id];return `<div class="qrow ${q.done?"done":""}"><span class="qtick">${q.done?"✓":""}</span><div class="qtxt"><span>${n}</span><div class="meter"><i style="width:${q.p/t*100}%"></i></div></div><span class="qr">+${r} J</span></div>`;}).join("")}</div>
-   ${S.chests?`<button class="btn wide chestbtn" id="chest">🎁 Open mystery box${S.chests>1?` (${S.chests})`:""}</button>`:`<p class="soft small">🎁 Mystery box in ${Math.max(1,8-(S.chestProg||0))} more right answers</p>`}
+   
   </div>`;
 }
-function openChest(){
+function openChest(){S.chests=0;return renderHome();
   if(!S.chests)return renderHome();S.chests--;S.boxes=(S.boxes||0)+1;badge("chest1");if(S.boxes>=5)badge("chest5");
   const notOwned=STICKERS.filter(([e])=>!S.owned["st:"+e]);const r=Math.random();let prize,apply;
   if(r<.2&&notOwned.length){const [e,n]=pick(notOwned);prize=`<div class="prize">${e}</div><p><b>${n} sticker</b></p>`;apply=()=>{S.owned["st:"+e]=1;if(S.eq.stickers.length<8)S.eq.stickers.push(e);};}
@@ -2584,7 +2582,7 @@ function dealItems(){
 }
 function applyBuy(key){const [t,v]=key.split(/:(.+)/);S.owned[key]=1;badge("shop1");
   if(t==="theme"){S.eq.theme=v;applyTheme();}if(t==="trail")S.eq.trail=v;if(t==="title")S.eq.title=v;if(t==="st"&&S.eq.stickers.length<8)S.eq.stickers.push(v);}
-function dealPopup(){
+function dealPopup(){return;
   const items=dealItems();if(!items.length)return;const box=document.getElementById("deal");
   const draw=()=>{box.innerHTML=`<div class="deal-in" role="dialog" aria-label="Shop deals"><p class="deal-top">🏷️ Deals for you: <b>30% off</b> right now</p>
     <div class="deal-items">${items.map((x,i)=>`<div class="deal-item">${x.icon}<span>${x.name}</span><s>${x.p} J</s><button class="btn small primary" data-i="${i}" ${x.bought||S.j<x.now?"disabled":""}>${x.bought?"Bought":x.now+" J"}</button></div>`).join("")}</div>
@@ -7653,7 +7651,7 @@ async function drawTeacher(){
   box.innerHTML=fracify(`
    <p class="soft">${live?"Live: pupils who open this app signed in, with a class code, appear here as they work.":"Paste pupils’ progress codes below. When this app is opened signed in on claude.ai by its owner, pupils with a class code appear here automatically."}</p>
    <div class="panel row-b"><label class="q" for="tcls">Class</label><select id="tcls"><option value="">All classes (${all.length})</option>${classes.map(c=>`<option value="${esc(c)}" ${c===TEACH.cls?"selected":""}>${esc(c)} (${all.filter(r=>(r.cls||"(no class)")===c).length})</option>`).join("")}</select></div>
-   ${live?`<div class="panel"><label class="setrow"><input type="checkbox" role="switch" class="swi" id="cfocus" ${CLASSCFG.focus?"checked":""}><span><b>Focus mode for everyone</b><span class="soft small">Hides joules, quests, mystery boxes and the shop on every pupil’s app</span></span></label></div>`:""}
+   ${live?`<div class="panel"><label class="setrow"><input type="checkbox" role="switch" class="swi" id="cfocus" ${CLASSCFG.focus?"checked":""}><span><b>Focus mode for everyone</b><span class="soft small">Hides joules, quests and the shop on every pupil’s app</span></span></label></div>`:""}
    ${rows.length?`<div class="tstats"><div><b>${rows.length}</b><span>pupils</span></div><div class="${found.length?"warnstat":""}"><b>${found.length}</b><span>at Foundations in a topic</span></div><div><b>${rows.filter(r=>r.rec!=null&&r.rec<0.6).length}</b><span>finding it hard right now</span></div><div><b>${rows.filter(r=>(NOW()-(r.last||0))>7*DAY).length}</b><span>not active this week</span></div></div>
    <div class="panel"><h3>Pupils · most in need first</h3><div class="tscroll"><table class="t track tdash"><tr><th>Pupil</th>${TOPICS.map(t=>`<th title="${TOPIC[t].t}">${TIC[TOPIC[t].ic]}</th>`).join("")}<th>Recent</th><th title="Mini test: last (best)">📝</th><th>Active</th></tr>
     ${rows.map((r,i)=>`<tr class="trow" data-i="${i}"><td><b>${nm(r)}</b>${r.cls&&!TEACH.cls?` <span class="soft small">${esc(r.cls)}</span>`:""}${Object.values(r.tp||{}).some(x=>x.f)?` <span class="lvchip found">F</span>`:""}</td>${TOPICS.map(t=>`<td>${chip((r.tp||{})[t],t)}</td>`).join("")}<td class="num">${r.rec!=null?Math.round(r.rec*100)+"%":"–"}</td><td class="num small">${r.mt?`${r.mt.last}/${r.mt.n||8} <span class="soft">(${r.mt.best})</span>`:"–"}</td><td class="small">${ago(r.last)}</td></tr>`).join("")}</table></div>
@@ -7951,7 +7949,7 @@ function renderHome(){
   wireInclude(renderHome);
   const ut=document.getElementById("unitsTab");if(ut)ut.ontoggle=()=>{S.unitsOpen=ut.open;save();};
   const ch=document.getElementById("chest");if(ch)ch.onclick=openChest;
-  if(S.welcome){S.welcome=0;if(!fo)setTimeout(()=>{toast("👋 Welcome back! +20 J",0,{now:true});award(20,{raw:true});badge("back1");},400);}
+  if(S.welcome){S.welcome=0;if(!fo)setTimeout(()=>{toast("👋 Welcome back!",0,{now:true});badge("back1");},400);}
 }
 
 /* ============ tracking: levels per topic and big ideas ============ */
@@ -8056,10 +8054,10 @@ function renderSettings(){
 /* ============ focus mode (for teachers) ============ */
 const cleanCls=s=>String(s||"").toUpperCase().replace(/[^A-Z0-9-]/g,"").slice(0,16);
 function focusPanel(){
-  if(typeof CLASSCFG!=="undefined"&&CLASSCFG&&CLASSCFG.focus)return `<h3>Focus mode</h3><p class="small">Your teacher has turned on focus mode for your class: no joules, quests, mystery boxes or shop.</p>`;
-  if(S.focus)return `<h3>Focus mode is on</h3><p class="soft small">Joules, quests, mystery boxes and the shop are hidden. Enter the teacher PIN to turn it off.</p>
+  if(typeof CLASSCFG!=="undefined"&&CLASSCFG&&CLASSCFG.focus)return `<h3>Focus mode</h3><p class="small">Your teacher has turned on focus mode for your class: no joules, quests or shop.</p>`;
+  if(S.focus)return `<h3>Focus mode is on</h3><p class="soft small">Joules, quests and the shop are hidden. Enter the teacher PIN to turn it off.</p>
    <div class="row-g"><input type="password" inputmode="numeric" id="fpin" maxlength="4" placeholder="PIN" aria-label="Teacher PIN" class="pin"><button class="btn small" id="foff">Turn off</button></div><p class="soft small" id="fmsg"></p>`;
-  return `<h3>Focus mode</h3><p class="soft small">For teachers. Hides joules, quests, mystery boxes and the shop, so the app is only about the physics. Set a 4-digit PIN so pupils can’t switch it back.</p>
+  return `<h3>Focus mode</h3><p class="soft small">For teachers. Hides joules, quests and the shop, so the app is only about the physics. Set a 4-digit PIN so pupils can’t switch it back.</p>
    <div class="row-g"><input type="password" inputmode="numeric" id="fpin" maxlength="4" placeholder="New PIN" aria-label="New teacher PIN" class="pin"><button class="btn small" id="fon">Turn on</button></div><p class="soft small" id="fmsg"></p>`;}
 function wireFocus(){const p=document.getElementById("fpin"),m=document.getElementById("fmsg");
   const on=document.getElementById("fon"),off=document.getElementById("foff");
